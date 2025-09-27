@@ -28,19 +28,20 @@
 
 <body class="@yield('body-class', '')">
     <div id="wrapper">
-        <!-- Page Preloader -->
-        <div id="de-loader"></div>
+        <!-- page preloader begin -->
+        <div id="de-preloader"></div>
+        <!-- page preloader close -->
         
         <!-- Header -->
         @include('components.header')
         
-        <!-- Navigation -->
-        @include('components.navigation')
-        
-        <!-- Main Content -->
-        <div id="content">
+        <!-- content begin -->
+        <div class="no-bottom no-top" id="content">
             @yield('content')
         </div>
+        <!-- content close -->
+        
+        <a href="#" id="back-to-top"></a>
         
         <!-- Footer -->
         @include('components.footer')
@@ -49,13 +50,14 @@
     <!-- JavaScript Files -->
     <script src="{{ asset('js/plugins.js') }}"></script>
     <script src="{{ asset('js/designesia.js') }}"></script>
-    <script src="{{ asset('js/countdown-custom.js') }}"></script>
-    <script src="{{ asset('js/jquery.countdown.js') }}"></script>
     
     <!-- Custom Scripts -->
     @stack('scripts')
     
     <!-- Additional JavaScript -->
     @yield('javascript')
+    
+    <!-- Google Maps API (if needed) -->
+    {{-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initPlaces" async defer></script> --}}
 </body>
 </html>
