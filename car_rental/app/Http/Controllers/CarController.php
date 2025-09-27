@@ -18,7 +18,7 @@ class CarController extends Controller
 
         // Filter by car type
         if ($request->filled('car_type')) {
-            $query->where('car_type', $request->car_type);
+            $query->where('type', $request->car_type);
         }
 
         // Filter by fuel type
@@ -28,10 +28,10 @@ class CarController extends Controller
 
         // Filter by price range
         if ($request->filled('min_price')) {
-            $query->where('price_per_day', '>=', $request->min_price);
+            $query->where('daily_rate', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
-            $query->where('price_per_day', '<=', $request->max_price);
+            $query->where('daily_rate', '<=', $request->max_price);
         }
 
         // Filter by availability
@@ -57,9 +57,11 @@ class CarController extends Controller
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
         
-        $allowedSorts = ['price_per_day', 'year', 'created_at', 'make', 'model'];
+        $allowedSorts = ['daily_rate', 'price_per_day', 'year', 'created_at', 'make', 'model'];
         if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortOrder);
+            // Map price_per_day to daily_rate for database queries
+            $actualField = $sortBy === 'price_per_day' ? 'daily_rate' : $sortBy;
+            $query->orderBy($actualField, $sortOrder);
         } else {
             $query->orderBy('created_at', 'desc');
         }
@@ -78,7 +80,7 @@ class CarController extends Controller
 
         // Filter by car type
         if ($request->filled('car_type')) {
-            $query->whereIn('car_type', $request->car_type);
+            $query->whereIn('type', $request->car_type);
         }
 
         // Filter by fuel type
@@ -93,10 +95,10 @@ class CarController extends Controller
 
         // Filter by price range
         if ($request->filled('min_price')) {
-            $query->where('price_per_day', '>=', $request->min_price);
+            $query->where('daily_rate', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
-            $query->where('price_per_day', '<=', $request->max_price);
+            $query->where('daily_rate', '<=', $request->max_price);
         }
 
         // Filter by availability
@@ -122,9 +124,11 @@ class CarController extends Controller
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
         
-        $allowedSorts = ['price_per_day', 'year', 'created_at', 'make', 'model'];
+        $allowedSorts = ['daily_rate', 'price_per_day', 'year', 'created_at', 'make', 'model'];
         if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortOrder);
+            // Map price_per_day to daily_rate for database queries
+            $actualField = $sortBy === 'price_per_day' ? 'daily_rate' : $sortBy;
+            $query->orderBy($actualField, $sortOrder);
         } else {
             $query->orderBy('created_at', 'desc');
         }
@@ -151,19 +155,19 @@ class CarController extends Controller
             'make' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'year' => 'required|integer|min:1900|max:' . date('Y'),
-            'car_type' => 'required|in:sedan,suv,hatchback,convertible,coupe,wagon,pickup,minivan,luxury,sports,electric,hybrid',
-            'fuel_type' => 'required|in:gasoline,diesel,electric,hybrid',
-            'transmission' => 'required|in:manual,automatic',
+            'type' => 'required|in:economy,compact,standard,intermediate,full_size,premium,luxury,suv,minivan,convertible,sports_car,truck,van,exotic',
+            'fuel_type' => 'required|in:petrol,diesel,electric,hybrid,lpg',
+            'transmission' => 'required|in:manual,automatic,cvt',
             'seats' => 'required|integer|min:1|max:12',
             'doors' => 'required|integer|min:2|max:6',
-            'price_per_day' => 'required|numeric|min:0',
+            'daily_rate' => 'required|numeric|min:0',
             'mileage' => 'nullable|integer|min:0',
             'color' => 'nullable|string|max:100',
             'license_plate' => 'nullable|string|max:20|unique:cars',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'features' => 'nullable|json',
-            'images' => 'nullable|json',
+            'features' => 'nullable|array',
+            'gallery' => 'nullable|array',
             'is_available' => 'boolean',
             'is_featured' => 'boolean',
             'engine_size' => 'nullable|numeric|min:0',
@@ -214,19 +218,19 @@ class CarController extends Controller
             'make' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'year' => 'required|integer|min:1900|max:' . date('Y'),
-            'car_type' => 'required|in:sedan,suv,hatchback,convertible,coupe,wagon,pickup,minivan,luxury,sports,electric,hybrid',
-            'fuel_type' => 'required|in:gasoline,diesel,electric,hybrid',
-            'transmission' => 'required|in:manual,automatic',
+            'type' => 'required|in:economy,compact,standard,intermediate,full_size,premium,luxury,suv,minivan,convertible,sports_car,truck,van,exotic',
+            'fuel_type' => 'required|in:petrol,diesel,electric,hybrid,lpg',
+            'transmission' => 'required|in:manual,automatic,cvt',
             'seats' => 'required|integer|min:1|max:12',
             'doors' => 'required|integer|min:2|max:6',
-            'price_per_day' => 'required|numeric|min:0',
+            'daily_rate' => 'required|numeric|min:0',
             'mileage' => 'nullable|integer|min:0',
             'color' => 'nullable|string|max:100',
             'license_plate' => 'nullable|string|max:20|unique:cars,license_plate,' . $car->id,
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'features' => 'nullable|json',
-            'images' => 'nullable|json',
+            'features' => 'nullable|array',
+            'gallery' => 'nullable|array',
             'is_available' => 'boolean',
             'is_featured' => 'boolean',
             'engine_size' => 'nullable|numeric|min:0',
@@ -259,9 +263,9 @@ class CarController extends Controller
     public function getByType(Request $request)
     {
         $type = $request->get('type');
-        $cars = Car::where('car_type', $type)
+        $cars = Car::where('type', $type)
                    ->available()
-                   ->get(['id', 'make', 'model', 'year', 'price_per_day', 'images']);
+                   ->get(['id', 'make', 'model', 'year', 'daily_rate', 'image', 'gallery']);
 
         return response()->json($cars);
     }

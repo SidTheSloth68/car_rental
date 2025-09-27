@@ -24,12 +24,16 @@
         <div class="row g-5">
             <div class="col-lg-6">
                 <div id="slider-carousel" class="owl-carousel">
-                    @if($car->images && count(json_decode($car->images, true)) > 0)
-                        @foreach(json_decode($car->images, true) as $image)
+                    @if($car->gallery && is_array($car->gallery) && count($car->gallery) > 0)
+                        @foreach($car->gallery as $image)
                         <div class="item">
                             <img src="{{ asset('images/cars/' . $image) }}" alt="{{ $car->make }} {{ $car->model }}">
                         </div>
                         @endforeach
+                    @elseif($car->image)
+                        <div class="item">
+                            <img src="{{ asset('images/cars/' . $car->image) }}" alt="{{ $car->make }} {{ $car->model }}">
+                        </div>
                     @else
                         <div class="item">
                             <img src="{{ asset('images/cars/default-car.jpg') }}" alt="{{ $car->make }} {{ $car->model }}">
@@ -118,10 +122,22 @@
 
                 <h4>Features</h4>
                 <ul class="ul-style-2">
-                    @if($car->features && count(json_decode($car->features, true)) > 0)
-                        @foreach(json_decode($car->features, true) as $feature)
+                    @if($car->features && is_array($car->features) && count($car->features) > 0)
+                        @foreach($car->features as $feature)
                         <li>{{ $feature }}</li>
                         @endforeach
+                    @elseif($car->features && is_string($car->features))
+                        @php $features = json_decode($car->features, true); @endphp
+                        @if($features && count($features) > 0)
+                            @foreach($features as $feature)
+                            <li>{{ $feature }}</li>
+                            @endforeach
+                        @else
+                            <li>Air Conditioning</li>
+                            <li>Bluetooth</li>
+                            <li>GPS Navigation</li>
+                            <li>Power Steering</li>
+                        @endif
                     @else
                         <li>Air Conditioning</li>
                         <li>Bluetooth</li>
@@ -232,9 +248,10 @@
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="de-item mb30">
                     <div class="d-img">
-                        @if($relatedCar->images && count(json_decode($relatedCar->images, true)) > 0)
-                            @php $images = json_decode($relatedCar->images, true); @endphp
-                            <img src="{{ asset('images/cars/' . $images[0]) }}" class="img-fluid" alt="{{ $relatedCar->make }} {{ $relatedCar->model }}">
+                        @if($relatedCar->gallery && is_array($relatedCar->gallery) && count($relatedCar->gallery) > 0)
+                            <img src="{{ asset('images/cars/' . $relatedCar->gallery[0]) }}" class="img-fluid" alt="{{ $relatedCar->make }} {{ $relatedCar->model }}">
+                        @elseif($relatedCar->image)
+                            <img src="{{ asset('images/cars/' . $relatedCar->image) }}" class="img-fluid" alt="{{ $relatedCar->make }} {{ $relatedCar->model }}">
                         @else
                             <img src="{{ asset('images/cars/default-car.jpg') }}" class="img-fluid" alt="{{ $relatedCar->make }} {{ $relatedCar->model }}">
                         @endif

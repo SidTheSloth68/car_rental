@@ -148,9 +148,10 @@
                     <div class="col-lg-12">
                         <div class="de-item-list mb30">
                             <div class="d-img">
-                                @if($car->images && count(json_decode($car->images, true)) > 0)
-                                    @php $images = json_decode($car->images, true); @endphp
-                                    <img src="{{ asset('images/cars/' . $images[0]) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
+                                @if($car->gallery && is_array($car->gallery) && count($car->gallery) > 0)
+                                    <img src="{{ asset('images/cars/' . $car->gallery[0]) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
+                                @elseif($car->image)
+                                    <img src="{{ asset('images/cars/' . $car->image) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
                                 @else
                                     <img src="{{ asset('images/cars/default-car.jpg') }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
                                 @endif
@@ -185,14 +186,14 @@
                                     </div>
                                     @endif
                                     
-                                    @if($car->features && count(json_decode($car->features, true)) > 0)
+                                    @if($car->features && is_array($car->features) && count($car->features) > 0)
                                     <div class="car-features mt-2">
                                         <strong>Features:</strong>
-                                        @foreach(array_slice(json_decode($car->features, true), 0, 5) as $feature)
+                                        @foreach(array_slice($car->features, 0, 5) as $feature)
                                             <span class="badge bg-light text-dark me-1">{{ $feature }}</span>
                                         @endforeach
-                                        @if(count(json_decode($car->features, true)) > 5)
-                                            <span class="text-muted">+{{ count(json_decode($car->features, true)) - 5 }} more</span>
+                                        @if(count($car->features) > 5)
+                                            <span class="text-muted">+{{ count($car->features) - 5 }} more</span>
                                         @endif
                                     </div>
                                     @endif

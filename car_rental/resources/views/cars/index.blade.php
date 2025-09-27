@@ -140,9 +140,10 @@
                     <div class="col-xl-4 col-lg-6">
                         <div class="de-item mb30">
                             <div class="d-img">
-                                @if($car->images && count(json_decode($car->images, true)) > 0)
-                                    @php $images = json_decode($car->images, true); @endphp
-                                    <img src="{{ asset('images/cars/' . $images[0]) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
+                                @if($car->gallery && is_array($car->gallery) && count($car->gallery) > 0)
+                                    <img src="{{ asset('images/cars/' . $car->gallery[0]) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
+                                @elseif($car->image)
+                                    <img src="{{ asset('images/cars/' . $car->image) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
                                 @else
                                     <img src="{{ asset('images/cars/default-car.jpg') }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
                                 @endif

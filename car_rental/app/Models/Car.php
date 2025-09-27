@@ -281,4 +281,33 @@ class Car extends Model
             'days' => $days
         ];
     }
+
+    /**
+     * Accessor for price_per_day to map to daily_rate
+     */
+    public function getPricePerDayAttribute()
+    {
+        return $this->daily_rate;
+    }
+
+    /**
+     * Accessor for images to provide gallery or image
+     */
+    public function getImagesAttribute()
+    {
+        if ($this->gallery && is_array($this->gallery) && count($this->gallery) > 0) {
+            return $this->gallery;
+        } elseif ($this->image) {
+            return [$this->image];
+        }
+        return [];
+    }
+
+    /**
+     * Accessor for car_type to map to type
+     */
+    public function getCarTypeAttribute()
+    {
+        return $this->type;
+    }
 }
