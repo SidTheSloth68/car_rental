@@ -271,23 +271,46 @@ class CarController extends Controller
     }
 
     /**
-     * Search cars for autocomplete
+     * Handle car search form submission and AJAX autocomplete
      */
     public function search(Request $request)
     {
-        $query = $request->get('q');
-        
-        if (strlen($query) < 2) {
-            return response()->json([]);
+        // If it's an AJAX request for autocomplete
+        if ($request->ajax()) {
+            $query = $request->get('q');
+            
+            if (strlen($query) < 2) {
+                return response()->json([]);
+            }
+
+            $cars = Car::where('make', 'like', '%' . $query . '%')
+                       ->orWhere('model', 'like', '%' . $query . '%')
+                       ->available()
+                       ->limit(10)
+                       ->get(['id', 'make', 'model', 'year']);
+
+            return response()->json($cars);
         }
 
-        $cars = Car::where('make', 'like', '%' . $query . '%')
-                   ->orWhere('model', 'like', '%' . $query . '%')
-                   ->available()
-                   ->limit(10)
-                   ->get(['id', 'make', 'model', 'year']);
+        // Handle form submission - redirect to cars index with search parameters
+        $searchParams = $request->only([
+            'pickup_location',
+            'dropoff_location', 
+            'pickup_date',
+            'dropoff_date',
+            'car_type',
+            'fuel_type',
+            'min_price',
+            'max_price',
+            'search'
+        ]);
 
-        return response()->json($cars);
+        // Remove empty parameters
+        $searchParams = array_filter($searchParams, function($value) {
+            return !empty($value);
+        });
+
+        return redirect()->route('cars.index', $searchParams);
     }
 
     /**

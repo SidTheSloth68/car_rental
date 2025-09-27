@@ -2,7 +2,6 @@
 
 @section('title', $pageTitle ?? 'Home - Caravel Car Rental')
 @section('description', 'Looking for a vehicle? You\'re at the right place. Premium car rental service with luxury and economy vehicles')
-@section('body-class', 'onload="initialize()"')
 
 @section('content')
 <!-- Flash Messages -->
