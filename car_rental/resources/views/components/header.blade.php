@@ -10,8 +10,8 @@
                             <!-- logo begin -->
                             <div id="logo">
                                 <a href="{{ route('home') }}">
-                                    <img alt="Caravel" src="{{ asset('images/caravel-logo.png') }}" class="logo-1">
-                                    <img alt="Caravel" src="{{ asset('images/caravel-logo-light.png') }}" class="logo-2">
+                                    <img alt="Caravel" src="{{ asset('images/logo.png') }}" class="logo-1">
+                                    <img alt="Caravel" src="{{ asset('images/logo-2-light.png') }}" class="logo-2">
                                 </a>
                             </div>
                             <!-- logo close -->
