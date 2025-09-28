@@ -15,10 +15,10 @@
             <li><a class="menu-item" href="#">Car Single</a></li>
         </ul>
     </li>
-    <li><a class="menu-item" href="#">Booking</a>
+    <li><a class="menu-item" href="{{ route('booking.create') }}">Booking</a>
         <ul>
-            <li><a class="menu-item" href="#">Booking Form</a></li>
-            <li><a class="menu-item" href="#">Quick Booking</a></li>
+            <li><a class="menu-item" href="{{ route('booking.create') }}">Booking Form</a></li>
+            <li><a class="menu-item" href="{{ route('booking.quick') }}">Quick Booking</a></li>
         </ul>
     </li>
     <li><a class="menu-item" href="#">My Account</a>
@@ -31,21 +31,20 @@
     </li>
     <li><a class="menu-item" href="#">Pages</a>
         <ul>
-            <li><a class="menu-item" href="#">About Us</a></li>
-            <li><a class="menu-item" href="#">Contact</a></li>
-            <li><a class="menu-item" href="#">Login</a></li>
-            <li><a class="menu-item" href="#">Register</a></li>
+            <li><a class="menu-item" href="{{ route('about') }}">About Us</a></li>
+            <li><a class="menu-item" href="{{ route('contact.show') }}">Contact</a></li>
+            <li><a class="menu-item" href="{{ route('login') }}">Login</a></li>
+            <li><a class="menu-item" href="{{ route('register') }}">Register</a></li>
             <li><a class="menu-item" href="#">404</a></li>
         </ul>
     </li>
-    <li><a class="menu-item" href="#">News</a>
+    <li><a class="menu-item" href="{{ route('news.index') }}">News</a>
         <ul>
             <li><a class="menu-item" href="#">News Grid</a>
                 <ul>
-                    <li><a class="menu-item" href="#">Left Sidebar</a></li>
-                    <li><a class="menu-item" href="#">Right Sidebar</a></li>
-                    <li><a class="menu-item" href="#">No Sidebar</a></li>
-                    <li><a class="menu-item" href="#">Full Width</a></li>
+                    <li><a class="menu-item" href="{{ route('news.grid.left') }}">Left Sidebar</a></li>
+                    <li><a class="menu-item" href="{{ route('news.grid.right') }}">Right Sidebar</a></li>
+                    <li><a class="menu-item" href="{{ route('news.grid.none') }}">No Sidebar</a></li>
                 </ul>
             </li>
             <li><a class="menu-item" href="#">News List</a>
@@ -55,7 +54,15 @@
                     <li><a class="menu-item" href="#">No Sidebar</a></li>
                 </ul>
             </li>
-            <li><a class="menu-item" href="#">News Single</a></li>
+                        <li><a class="menu-item" href="#">News Standard</a>
+                <ul>
+                    <li><a class="menu-item" href="{{ route('news.standard.left') }}">Left Sidebar</a></li>
+                    <li><a class="menu-item" href="{{ route('news.standard.right') }}">Right Sidebar</a></li>
+                    <li><a class="menu-item" href="{{ route('news.standard.none') }}">No Sidebar</a></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
         </ul>
     </li>
     <li><a class="menu-item" href="#">Elements</a>
