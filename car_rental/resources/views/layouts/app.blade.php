@@ -9,13 +9,17 @@
         <meta name="description" content="@yield('description', 'Car rental service')">
         <link rel="icon" href="{{ asset('images/icon.png') }}" type="image/gif" sizes="16x16">
 
-        <!-- Rentaly CSS Files -->
+        <!-- Caravel CSS Files -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" id="bootstrap">
         <link href="{{ asset('css/mdb.min.css') }}" rel="stylesheet" type="text/css" id="mdb">
         <link href="{{ asset('css/plugins.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('css/style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('css/coloring.css') }}" rel="stylesheet" type="text/css">
         <link id="colors" href="{{ asset('css/colors/scheme-01.css') }}" rel="stylesheet" type="text/css">
+        
+        <!-- Dark Theme CSS -->
+        <link href="{{ asset('css/dark-theme.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('css/theme-toggle.css') }}" rel="stylesheet" type="text/css">
 
         <!-- Laravel Vite Assets - Only JS, CSS disabled to prevent Tailwind conflicts -->
         @vite(['resources/js/app.js'])
@@ -49,7 +53,7 @@
                     <div class="row g-custom-x">
                         <div class="col-lg-3">
                             <div class="widget">
-                                <h5>About Rentaly</h5>
+                                <h5>About Caravel</h5>
                                 <p>Where quality meets affordability. We understand the importance of a smooth and enjoyable journey without the burden of excessive costs. That's why we have meticulously crafted our offerings to provide you with top-notch vehicles at minimum expense.</p>
                             </div>
                         </div>
@@ -104,7 +108,7 @@
                                 <div class="de-flex">
                                     <div class="de-flex-col">
                                         <a href="{{ route('home') }}">
-                                            Copyright 2025 - Rentaly by Designesia
+                                            Copyright 2025 - Caravel by BinOmar
                                         </a>
                                     </div>
                                     <ul class="menu-simple">
@@ -120,9 +124,14 @@
             <!-- footer close -->
         </div>
 
-        <!-- Rentaly JavaScript Files -->
+        <!-- Caravel JavaScript Files -->
         <script src="{{ asset('js/plugins.js') }}"></script>
         <script src="{{ asset('js/designesia.js') }}"></script>
+        
+        <!-- Dark Theme Manager -->
+        <script src="{{ asset('js/theme-manager.js') }}"></script>
+        
         @yield('scripts')
+        @stack('scripts')
     </body>
 </html>

@@ -51,7 +51,7 @@
 <body>
     <div class="header">
         <h1>New Contact Form Submission</h1>
-        <p>Rentaly Car Rental</p>
+        <p>Caravel Car Rental</p>
     </div>
     
     <div class="content">
@@ -77,7 +77,7 @@
     </div>
     
     <div class="footer">
-        <p>This message was sent from the Rentaly contact form.</p>
+        <p>This message was sent from the Caravel contact form.</p>
         <p>Please reply directly to {{ $email }} to respond to this inquiry.</p>
     </div>
 </body>

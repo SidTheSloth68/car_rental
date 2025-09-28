@@ -10,14 +10,6 @@ use Illuminate\Support\Facades\Storage;
 class NewsController extends Controller
 {
     /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['index', 'show', 'category', 'search']);
-    }
-
-    /**
      * Display a listing of published news articles.
      */
     public function index(Request $request)
@@ -88,25 +80,22 @@ class NewsController extends Controller
     }
 
     /**
-     * Display news by category
+     * Show news by category.
      */
-    public function category($category, Request $request)
+    public function category($category)
     {
-        if (!array_key_exists($category, News::CATEGORIES)) {
-            abort(404);
-        }
-
-        $query = News::published()->category($category)->with('author');
+        $categories = $this->getCategories();
         
-        if ($request->filled('search')) {
-            $query->search($request->search);
+        if (!array_key_exists($category, $categories)) {
+            abort(404, 'Category not found');
         }
+        
+        $news = News::where('category', $category)
+                   ->where('status', 'published')
+                   ->orderBy('published_at', 'desc')
+                   ->paginate(12);
 
-        $news = $query->orderBy('published_at', 'desc')->paginate(12);
-        $categoryName = News::CATEGORIES[$category];
-        $featuredNews = News::published()->featured()->where('category', $category)->limit(3)->get();
-
-        return view('news.category', compact('news', 'category', 'categoryName', 'featuredNews'));
+        return view('news.category', compact('news', 'category', 'categories'));
     }
 
     /**
@@ -116,6 +105,7 @@ class NewsController extends Controller
     {
         $searchTerm = $request->get('q', '');
         $category = $request->get('category');
+        $categories = $this->getCategories();
 
         $query = News::published()->with('author');
 
@@ -123,12 +113,11 @@ class NewsController extends Controller
             $query->search($searchTerm);
         }
 
-        if ($category && array_key_exists($category, News::CATEGORIES)) {
+        if ($category && array_key_exists($category, $categories)) {
             $query->category($category);
         }
 
         $news = $query->orderBy('published_at', 'desc')->paginate(12);
-        $categories = News::CATEGORIES;
 
         return view('news.search', compact('news', 'searchTerm', 'category', 'categories'));
     }
@@ -304,12 +293,63 @@ class NewsController extends Controller
             $query->category($request->category);
         }
 
-        $news = $query->orderBy('published_at', 'desc')->paginate(9);
-        $featuredNews = News::published()->featured()->limit(3)->get();
-        $categories = News::CATEGORIES;
-        $recentArticles = News::published()->recent(5)->get();
+        // Handle monthly archives
+        if ($request->filled('month') && $request->filled('year')) {
+            $query->whereRaw("strftime('%Y', published_at) = ?", [$request->year])
+                  ->whereRaw("strftime('%m', published_at) = ?", [sprintf('%02d', $request->month)]);
+        }
 
-        return view("news.grid-{$sidebar}-sidebar", compact('news', 'featuredNews', 'categories', 'recentArticles', 'sidebar'));
+        $news = $query->orderBy('published_at', 'desc')->paginate(12);
+        
+        // Get data for sidebar widgets
+        $recentNews = News::published()->recent(5)->get();
+        
+        // Get category counts for widget
+        $categoryCounts = [];
+        foreach (News::CATEGORIES as $key => $name) {
+            $categoryCounts[$key] = News::published()->category($key)->count();
+        }
+        
+        // Get archives data (last 12 months) - SQLite compatible
+        $archives = collect([]);
+        
+        try {
+            $publishedNews = News::published()
+                                ->select('published_at')
+                                ->orderBy('published_at', 'desc')
+                                ->get();
+            
+            $monthlyData = [];
+            foreach ($publishedNews as $article) {
+                if (!$article->published_at) continue;
+                
+                $year = $article->published_at->format('Y');
+                $month = $article->published_at->format('n');
+                $monthName = $article->published_at->format('F');
+                $key = $year . '-' . sprintf('%02d', $month);
+                
+                if (!isset($monthlyData[$key])) {
+                    $monthlyData[$key] = (object) [
+                        'year' => $year,
+                        'month' => sprintf('%02d', $month),
+                        'month_name' => $monthName,
+                        'count' => 0
+                    ];
+                }
+                $monthlyData[$key]->count++;
+            }
+            
+            // Sort by year and month desc, limit to 12
+            krsort($monthlyData);
+            $archives = collect(array_slice($monthlyData, 0, 12))->values();
+        } catch (\Exception $e) {
+            // If there's any error, just return empty archives
+            $archives = collect([]);
+        }
+
+        $viewName = $sidebar === 'none' ? 'news.grid-no-sidebar' : "news.grid-{$sidebar}-sidebar";
+        
+        return view($viewName, compact('news', 'recentNews', 'categoryCounts', 'archives'));
     }
 
     /**
@@ -327,11 +367,79 @@ class NewsController extends Controller
             $query->category($request->category);
         }
 
-        $news = $query->orderBy('published_at', 'desc')->paginate(6);
-        $featuredNews = News::published()->featured()->limit(3)->get();
-        $categories = News::CATEGORIES;
-        $recentArticles = News::published()->recent(5)->get();
+        // Handle monthly archives
+        if ($request->filled('month') && $request->filled('year')) {
+            $query->whereRaw("strftime('%Y', published_at) = ?", [$request->year])
+                  ->whereRaw("strftime('%m', published_at) = ?", [sprintf('%02d', $request->month)]);
+        }
 
-        return view("news.standard-{$sidebar}-sidebar", compact('news', 'featuredNews', 'categories', 'recentArticles', 'sidebar'));
+        $news = $query->orderBy('published_at', 'desc')->paginate(6);
+        
+        // Get data for sidebar widgets
+        $recentNews = News::published()->recent(5)->get();
+        $featuredNews = News::published()->featured()->limit(3)->get();
+        
+        // Get category counts for widget
+        $categoryCounts = [];
+        foreach (News::CATEGORIES as $key => $name) {
+            $categoryCounts[$key] = News::published()->category($key)->count();
+        }
+        
+        // Get archives data (last 12 months) - SQLite compatible  
+        $archives = collect([]);
+        
+        try {
+            $publishedNews = News::published()
+                                ->select('published_at')
+                                ->orderBy('published_at', 'desc')
+                                ->get();
+            
+            $monthlyData = [];
+            foreach ($publishedNews as $article) {
+                if (!$article->published_at) continue;
+                
+                $year = $article->published_at->format('Y');
+                $month = $article->published_at->format('n');
+                $monthName = $article->published_at->format('F');
+                $key = $year . '-' . sprintf('%02d', $month);
+                
+                if (!isset($monthlyData[$key])) {
+                    $monthlyData[$key] = (object) [
+                        'year' => $year,
+                        'month' => sprintf('%02d', $month),
+                        'month_name' => $monthName,  
+                        'count' => 0
+                    ];
+                }
+                $monthlyData[$key]->count++;
+            }
+            
+            // Sort by year and month desc, limit to 12
+            krsort($monthlyData);
+            $archives = collect(array_slice($monthlyData, 0, 12))->values();
+        } catch (\Exception $e) {
+            // If there's any error, just return empty archives
+            $archives = collect([]);
+        }
+
+        $viewName = $sidebar === 'none' ? 'news.standard-no-sidebar' : "news.standard-{$sidebar}-sidebar";
+        
+        return view($viewName, compact('news', 'recentNews', 'featuredNews', 'categoryCounts', 'archives'));
+    }
+
+    /**
+     * Get categories for display
+     */
+    private function getCategories()
+    {
+        return [
+            'car_reviews' => 'Car Reviews',
+            'travel_tips' => 'Travel Tips',
+            'industry_news' => 'Industry News',
+            'company_news' => 'Company News',
+            'promotions' => 'Promotions',
+            'guides' => 'Guides',
+            'events' => 'Events'
+        ];
     }
 }

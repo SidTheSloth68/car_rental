@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'About Us - Rentaly')
+@section('title', 'About Us - Caravel')
 
 @section('content')
 <!-- subheader begin -->
@@ -23,11 +23,11 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <img src="{{ asset('images/about/about-main.jpg') }}" class="img-fluid rounded shadow" alt="About Rentaly">
+                <img src="{{ asset('images/about/about-main.jpg') }}" class="img-fluid rounded shadow" alt="About Caravel">
             </div>
             <div class="col-lg-6">
-                <h2 class="mb-3">Welcome to Rentaly</h2>
-                <p class="lead">Rentaly is your trusted partner for car rentals, offering a wide range of vehicles to suit every journey, taste, and budget. Whether you're planning a weekend getaway, a business trip, or a family vacation, we have the perfect car for you.</p>
+                <h2 class="mb-3">Welcome to Caravel</h2>
+                <p class="lead">Caravel is your trusted partner for car rentals, offering a wide range of vehicles to suit every journey, taste, and budget. Whether you're planning a weekend getaway, a business trip, or a family vacation, we have the perfect car for you.</p>
                 <ul class="list-unstyled mb-4">
                     <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Wide selection of cars, SUVs, vans, and luxury vehicles</li>
                     <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Competitive pricing and transparent rates</li>

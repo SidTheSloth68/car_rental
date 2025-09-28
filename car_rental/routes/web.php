@@ -35,14 +35,24 @@ Route::get('/news/search', [NewsController::class, 'search'])->name('news.search
 Route::get('/news/category/{category}', [NewsController::class, 'category'])->name('news.category');
 
 // Different news layout views
-Route::get('/news/grid/right-sidebar', [NewsController::class, 'gridRightSidebar'])->name('news.grid.right');
-Route::get('/news/grid/left-sidebar', [NewsController::class, 'gridLeftSidebar'])->name('news.grid.left');
-Route::get('/news/grid/no-sidebar', [NewsController::class, 'gridNoSidebar'])->name('news.grid.none');
-Route::get('/news/standard/right-sidebar', [NewsController::class, 'standardRightSidebar'])->name('news.standard.right');
-Route::get('/news/standard/left-sidebar', [NewsController::class, 'standardLeftSidebar'])->name('news.standard.left');
-Route::get('/news/standard/no-sidebar', [NewsController::class, 'standardNoSidebar'])->name('news.standard.none');
+Route::get('/news/grid/right-sidebar', [NewsController::class, 'gridRightSidebar'])->name('news.grid-right-sidebar');
+Route::get('/news/grid/left-sidebar', [NewsController::class, 'gridLeftSidebar'])->name('news.grid-left-sidebar');
+Route::get('/news/grid/no-sidebar', [NewsController::class, 'gridNoSidebar'])->name('news.grid-no-sidebar');
+Route::get('/news/standard/right-sidebar', [NewsController::class, 'standardRightSidebar'])->name('news.standard-right-sidebar');
+Route::get('/news/standard/left-sidebar', [NewsController::class, 'standardLeftSidebar'])->name('news.standard-left-sidebar');
+Route::get('/news/standard/no-sidebar', [NewsController::class, 'standardNoSidebar'])->name('news.standard-no-sidebar');
 
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
+
+// Newsletter subscription (placeholder route)
+Route::post('/newsletter/subscribe', function () {
+    return response()->json(['success' => true, 'message' => 'Subscribed successfully!']);
+})->name('newsletter.subscribe');
+
+// Dark Theme Demo Page
+Route::get('/dark-theme-demo', function () {
+    return view('dark-theme-demo');
+})->name('dark-theme-demo');
 
 // Authenticated user dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');

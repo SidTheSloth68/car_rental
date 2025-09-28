@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Book a Vehicle - Rentaly')
+@section('title', 'Book a Vehicle - Caravel')
 
 @section('content')
 <!-- subheader begin -->

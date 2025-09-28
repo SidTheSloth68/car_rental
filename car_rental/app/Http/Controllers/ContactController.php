@@ -29,7 +29,7 @@ class ContactController extends Controller
 
         try {
             // Send email to admin
-            Mail::to(config('mail.admin_email', 'admin@rentaly.com'))
+            Mail::to(config('mail.admin_email', 'admin@caravel.com'))
                 ->send(new ContactMail($validated));
 
             return redirect()->back()

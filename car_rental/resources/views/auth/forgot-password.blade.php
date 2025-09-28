@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Forgot Password - Rentaly')
-@section('description', 'Reset your password to access your Rentaly account')
+@section('title', 'Forgot Password - Caravel')
+@section('description', 'Reset your password to access your Caravel account')
 
 @section('content')
 <!-- section begin -->

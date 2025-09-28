@@ -1,39 +1,9 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@extends('layouts.app')
 
-<head>
-    <title>{{ config('app.name', 'Rentaly') }} - Login</title>
-    <link rel="icon" href="{{ asset('images/icon.png') }}" type="image/gif" sizes="16x16">
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta content="Rentaly - Multipurpose Vehicle Car Rental Website Template" name="description">
-    <meta content="" name="keywords">
-    <meta content="" name="author">
-    <!-- CSS Files
-    ================================================== -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" id="bootstrap">
-    <link href="{{ asset('css/mdb.min.css') }}" rel="stylesheet" type="text/css" id="mdb">
-    <link href="{{ asset('css/plugins.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('css/coloring.css') }}" rel="stylesheet" type="text/css">
-    <!-- color scheme -->
-    <link id="colors" href="{{ asset('css/colors/scheme-01.css') }}" rel="stylesheet" type="text/css">
-    <!-- font awesome -->
-    <link href="{{ asset('fonts/font-awesome/css/font-awesome.css') }}" rel="stylesheet" type="text/css">
-</head>
+@section('title', 'Login - Caravel')
+@section('description', 'Sign in to your Caravel account')
 
-<body>
-    <div id="wrapper">
-        
-        <!-- page preloader begin -->
-        <div id="de-preloader"></div>
-        <!-- page preloader close -->
-
-        <!-- header begin -->
-        @include('components.header')
-        <!-- header close -->
-        
+@section('content')
         <!-- content begin -->
         <div class="no-bottom no-top" id="content">
             <div id="top"></div>
@@ -140,15 +110,4 @@
             </section>
         </div>
         <!-- content close -->
-
-        @include('components.footer')
-    </div>
-    
-    <!-- Javascript Files
-    ================================================== -->
-    <script src="{{ asset('js/plugins.js') }}"></script>
-    <script src="{{ asset('js/designesia.js') }}"></script>
-
-</body>
-
-</html>
+@endsection

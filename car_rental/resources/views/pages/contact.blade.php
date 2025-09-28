@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Us - Rentaly')
+@section('title', 'Contact Us - Caravel')
 
 @section('content')
 <!-- subheader begin -->
@@ -27,7 +27,7 @@
                 <p class="lead">Have questions, need help, or want to give feedback? Our team is here to assist you 24/7. Fill out the form or use the contact details below.</p>
                 <ul class="list-unstyled mb-4">
                     <li class="mb-2"><i class="fa fa-phone text-primary me-2"></i> <strong>Phone:</strong> +208 333 9296</li>
-                    <li class="mb-2"><i class="fa fa-envelope text-primary me-2"></i> <strong>Email:</strong> contact@rentaly.com</li>
+                    <li class="mb-2"><i class="fa fa-envelope text-primary me-2"></i> <strong>Email:</strong> contact@caravel.com</li>
                     <li class="mb-2"><i class="fa fa-map-marker text-primary me-2"></i> <strong>Address:</strong> 123 Main Street, New York, NY</li>
                 </ul>
                 <div class="social-icons mt-3">
