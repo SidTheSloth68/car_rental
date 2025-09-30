@@ -13,16 +13,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->command->info('🚀 Starting database seeding...');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seed users first (required for news authors)
+        $this->call([
+            UserSeeder::class,
         ]);
 
         // Seed cars data
         $this->call([
             CarSeeder::class,
         ]);
+
+        // Seed news articles (requires users for authors)
+        $this->call([
+            NewsSeeder::class,
+        ]);
+
+        $this->command->info('✅ Database seeding completed successfully!');
+        $this->command->info('📊 Summary:');
+        $this->command->info('   - Users: ' . \App\Models\User::count());
+        $this->command->info('   - Cars: ' . \App\Models\Car::count());
+        $this->command->info('   - News Articles: ' . \App\Models\News::count());
     }
 }

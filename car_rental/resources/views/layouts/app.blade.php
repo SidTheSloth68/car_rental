@@ -4,12 +4,48 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="robots" content="index, follow">
+        <meta name="author" content="Rentaly Car Rental">
+        
+        <!-- Performance optimization -->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="format-detection" content="telephone=no">
+        
+        <!-- PWA Configuration -->
+        <link rel="manifest" href="{{ asset('manifest.json') }}">
+        <meta name="theme-color" content="#007bff">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="Rentaly">
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="@yield('title', config('app.name', 'Rentaly'))">
+        <meta property="og:description" content="@yield('description', 'Premium car rental service with easy booking and great rates')">
+        <meta property="og:image" content="{{ asset('images/og-image.jpg') }}">
+        
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ url()->current() }}">
+        <meta property="twitter:title" content="@yield('title', config('app.name', 'Rentaly'))">
+        <meta property="twitter:description" content="@yield('description', 'Premium car rental service with easy booking and great rates')">
+        <meta property="twitter:image" content="{{ asset('images/og-image.jpg') }}">
 
-        <title>@yield('title', config('app.name', 'Laravel'))</title>
-        <meta name="description" content="@yield('description', 'Car rental service')">
+        <title>@yield('title', config('app.name', 'Rentaly'))</title>
+        <meta name="description" content="@yield('description', 'Premium car rental service with easy booking and great rates')">
+        
+        <!-- Favicons -->
         <link rel="icon" href="{{ asset('images/icon.png') }}" type="image/gif" sizes="16x16">
+        <link rel="apple-touch-icon" href="{{ asset('images/icons/icon-192x192.png') }}">
+        
+        <!-- Preload critical resources -->
+        <link rel="preload" href="{{ asset('css/style.css') }}" as="style">
+        <link rel="preload" href="{{ asset('js/plugins.js') }}" as="script">
+        <link rel="dns-prefetch" href="//fonts.googleapis.com">
+        <link rel="dns-prefetch" href="//fonts.gstatic.com">
 
-        <!-- Caravel CSS Files -->
+        <!-- Optimized CSS Files -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" id="bootstrap">
         <link href="{{ asset('css/mdb.min.css') }}" rel="stylesheet" type="text/css" id="mdb">
         <link href="{{ asset('css/plugins.css') }}" rel="stylesheet" type="text/css">
@@ -20,9 +56,17 @@
         <!-- Dark Theme CSS -->
         <link href="{{ asset('css/dark-theme.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('css/theme-toggle.css') }}" rel="stylesheet" type="text/css">
+        
+        <!-- Optimized CSS -->
+        <link href="{{ asset('css/optimized.css') }}" rel="stylesheet" type="text/css">
 
-        <!-- Laravel Vite Assets - Only JS, CSS disabled to prevent Tailwind conflicts -->
+        <!-- Laravel Vite Assets -->
         @vite(['resources/js/app.js'])
+        
+        <!-- Optimized JS -->
+        <script src="{{ asset('js/optimized.js') }}" defer></script>
+        
+        @stack('styles')
     </head>
     <body @yield('body-class')>
         <div id="wrapper">

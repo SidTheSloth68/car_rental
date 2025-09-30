@@ -21,6 +21,23 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'phone',
+        'address',
+        'date_of_birth',
+        'license_number',
+        'license_expiry',
+        'profile_photo',
+        'bio',
+        'preferences',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'is_active',
+        'last_login_at',
+        'total_bookings',
+        'loyalty_points',
+        'preferred_payment_method',
+        'email_verified_at',
     ];
 
     /**

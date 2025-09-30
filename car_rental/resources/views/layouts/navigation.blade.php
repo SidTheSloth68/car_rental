@@ -24,6 +24,9 @@
                 @endguest
                 @auth
                     <div class="topbar-widget"><a href="{{ route('dashboard') }}">Dashboard</a></div>
+                    @if(auth()->user()->role === 'admin')
+                        <div class="topbar-widget"><a href="{{ route('admin.dashboard') }}" style="color: #ffd700;"><i class="fa fa-cog"></i> Admin Panel</a></div>
+                    @endif
                     <div class="topbar-widget">
                         <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                             @csrf
@@ -64,6 +67,11 @@
                     <div class="de-flex-col">
                         <div class="menu_side_area">
                             @auth
+                                @if(auth()->user()->role === 'admin')
+                                    <a href="{{ route('admin.dashboard') }}" class="btn-main" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-right: 10px;" title="Admin Dashboard">
+                                        <i class="fa fa-cog"></i> Admin
+                                    </a>
+                                @endif
                                 <a href="{{ route('dashboard') }}" id="btn-book-now" class="btn-main">Dashboard</a>
                             @else
                                 <a href="{{ route('login') }}" id="btn-book-now" class="btn-main">Sign In</a>

@@ -1,0 +1,188 @@
+/* Optimized CSS for Car Rental Application */
+
+/* Critical CSS for above-the-fold content */
+
+/* Navigation optimizations */
+.navbar {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* Hero section optimizations */
+.hero-section {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+}
+
+.hero-content {
+    color: white;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Car grid optimizations */
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.car-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.car-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Button optimizations */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive optimizations */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .car-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Car cards */
+    .car-card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .car-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+}
+
+/* Performance optimizations */
+* {
+    box-sizing: border-box;
+}
+
+/* Lazy loading images */
+img[data-src] {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+img[data-loaded="true"] {
+    opacity: 1;
+}
+
+/* Optimize fonts */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/roboto-v20-latin-regular.woff2') format('woff2');
+}
+
+/* Dark theme variables */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --accent-color: #007bff;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #404040;
+    --accent-color: #4dabf7;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 50vh;
+        text-align: center;
+    }
+    
+    .car-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animation optimizations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        font-size: 12pt;
+        color: #000 !important;
+        background: #fff !important;
+    }
+}

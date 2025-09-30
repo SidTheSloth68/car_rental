@@ -676,7 +676,7 @@ header .header-col.mid .social-icons {
     color:#ffffff;
 }
 
-.rtl #mainmenu li.has-child:after {x
+.rtl #mainmenu li.has-child:after {
     position: absolute;
     left: 25px;
 }

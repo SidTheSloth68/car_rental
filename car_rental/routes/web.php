@@ -93,5 +93,32 @@ Route::middleware('auth')->group(function () {
     ]);
 });
 
+// Admin routes - require authentication and admin role
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Admin Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index']); // Redirect /admin to dashboard
+    
+    // User Management
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    
+    // Car Management
+    Route::resource('cars', \App\Http\Controllers\Admin\CarController::class);
+    Route::patch('/cars/{car}/toggle-availability', [\App\Http\Controllers\Admin\CarController::class, 'toggleAvailability'])->name('cars.toggle-availability');
+    
+    // Booking Management
+    Route::get('/bookings', [\App\Http\Controllers\Admin\AdminController::class, 'bookings'])->name('bookings');
+    Route::get('/bookings/{booking}', [\App\Http\Controllers\Admin\AdminController::class, 'showBooking'])->name('bookings.show');
+    Route::patch('/bookings/{booking}/status', [\App\Http\Controllers\Admin\AdminController::class, 'updateBookingStatus'])->name('bookings.update-status');
+    
+    // News Management
+    Route::get('/news', [\App\Http\Controllers\Admin\AdminController::class, 'news'])->name('news');
+    Route::get('/news/{news}', [\App\Http\Controllers\Admin\AdminController::class, 'showNews'])->name('news.show');
+    Route::patch('/news/{news}/status', [\App\Http\Controllers\Admin\AdminController::class, 'updateNewsStatus'])->name('news.update-status');
+    
+    // Settings
+    Route::get('/settings', [\App\Http\Controllers\Admin\AdminController::class, 'settings'])->name('settings');
+});
+
 // Include authentication routes
 require __DIR__.'/auth.php';

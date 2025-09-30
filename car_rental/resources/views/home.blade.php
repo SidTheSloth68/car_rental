@@ -461,6 +461,31 @@
             </div>
         </div>
     </section>
+
+    <!-- Admin Quick Access (only visible to admins) -->
+    @auth
+        @if(auth()->user()->role === 'admin')
+        <section aria-label="admin-access" class="pt20 pb20" data-bgcolor="#f8f9fa">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="text-center">
+                            <div class="alert alert-info d-inline-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+                                <i class="fa fa-user-shield fa-lg me-3"></i>
+                                <div>
+                                    <strong>Welcome Admin!</strong> 
+                                    <a href="{{ route('admin.dashboard') }}" class="btn btn-light btn-sm ms-3">
+                                        <i class="fa fa-cog"></i> Access Admin Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        @endif
+    @endauth
 </div>
 
 <!-- Back to top -->
