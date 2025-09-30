@@ -49,10 +49,20 @@ Route::post('/newsletter/subscribe', function () {
     return response()->json(['success' => true, 'message' => 'Subscribed successfully!']);
 })->name('newsletter.subscribe');
 
-// Dark Theme Demo Page
+// Dark theme demo route
 Route::get('/dark-theme-demo', function () {
     return view('dark-theme-demo');
 })->name('dark-theme-demo');
+
+// UI Components demo route
+Route::get('/ui-components', function () {
+    return view('ui-components-demo');
+})->name('ui-components-demo');
+
+// Icon Components demo route
+Route::get('/icon-components', function () {
+    return view('icon-components-demo');
+})->name('icon-components-demo');
 
 // Authenticated user dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
