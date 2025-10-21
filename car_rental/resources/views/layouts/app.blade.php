@@ -51,11 +51,15 @@
         <link href="{{ asset('css/plugins.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('css/style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('css/coloring.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('css/custom-1.css') }}" rel="stylesheet" type="text/css">
         <link id="colors" href="{{ asset('css/colors/scheme-01.css') }}" rel="stylesheet" type="text/css">
         
         <!-- Dark Theme CSS -->
         <link href="{{ asset('css/dark-theme.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('css/theme-toggle.css') }}" rel="stylesheet" type="text/css">
+        
+        <!-- Topbar Alignment Fix -->
+        <link href="{{ asset('css/topbar-fix.css') }}" rel="stylesheet" type="text/css">
         
         <!-- Optimized CSS -->
         <link href="{{ asset('css/optimized.css') }}" rel="stylesheet" type="text/css">
@@ -174,6 +178,38 @@
         
         <!-- Dark Theme Manager -->
         <script src="{{ asset('js/theme-manager.js') }}"></script>
+        
+        <!-- Fix for menu items with submenus - allow parent link clicks -->
+        <script>
+        jQuery(document).ready(function($) {
+            // For desktop: Allow direct click on parent menu items that have URLs
+            $('#mainmenu > li > a[href]:not([href="#"])').on('click', function(e) {
+                var $this = $(this);
+                var href = $this.attr('href');
+                
+                // If clicking directly on the link text (not the arrow/span)
+                if (e.target === this && href && href !== '#') {
+                    // Allow navigation
+                    window.location.href = href;
+                    return false;
+                }
+            });
+            
+            // For mobile: ensure menu items work
+            $('#mainmenu a[href]:not([href="#"])').each(function() {
+                var $link = $(this);
+                var href = $link.attr('href');
+                
+                // Add touch event for mobile
+                $link.on('touchend', function(e) {
+                    if (href && href !== '#' && e.target === this) {
+                        e.preventDefault();
+                        window.location.href = href;
+                    }
+                });
+            });
+        });
+        </script>
         
         @yield('scripts')
         @stack('scripts')

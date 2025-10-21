@@ -24,12 +24,12 @@
 
 <!-- Featured Articles Section -->
 @if($featuredNews && $featuredNews->count() > 0)
-<section id="section-featured" class="pt80 pb40">
+<section id="section-featured" class="pt80 pb80">
     <div class="container">
         <div class="row">
             <div class="col-lg-12 text-center">
-                <h2>Featured Articles</h2>
-                <p class="lead">Don't miss these trending stories</p>
+                <h2>Latest Car News</h2>
+                <p class="lead">Stay updated with trending automotive stories from around the world</p>
                 <div class="spacer-20"></div>
             </div>
         </div>
@@ -40,181 +40,92 @@
                     <div class="post-content">
                         <div class="post-image">
                             <div class="date-box">
-                                <div class="m">{{ $featured->published_at->format('d') }}</div>
-                                <div class="d">{{ $featured->published_at->format('M') }}</div>
+                                <div class="m">{{ date('d', strtotime($featured->published_at)) }}</div>
+                                <div class="d">{{ date('M', strtotime($featured->published_at)) }}</div>
                             </div>
+                            @if(isset($featured->featured_image_url))
                             <img alt="{{ $featured->title }}" 
-                                 src="{{ $featured->featured_image ? asset('storage/' . $featured->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
+                                 src="{{ $featured->featured_image_url }}" 
+                                 class="lazy"
+                                 style="width: 100%; height: 250px; object-fit: cover;"
+                                 onerror="this.src='{{ asset('images/news/pic-blog-1.jpg') }}'">
+                            @else
+                            <img alt="{{ $featured->title }}" 
+                                 src="{{ asset('images/news/pic-blog-1.jpg') }}" 
                                  class="lazy">
+                            @endif
                         </div>
                         <div class="post-text">
-                            <span class="p-tagline">{{ ucfirst(str_replace('-', ' ', $featured->category)) }}</span>
-                            <h4><a href="{{ route('news.show', $featured->slug) }}">{{ $featured->title }}</a></h4>
-                            <p>{{ Str::limit($featured->excerpt ?: strip_tags($featured->content), 100) }}</p>
-                            <span class="p-author">By {{ $featured->author->name ?? 'Admin' }}</span>
+                            @if(isset($featured->external_source))
+                            <span class="p-tagline">
+                                <i class="fa fa-external-link"></i> {{ $featured->external_source }}
+                            </span>
+                            @endif
+                            <h4>
+                                <a href="{{ $featured->external_url ?? '#' }}" target="_blank">
+                                    {{ Str::limit($featured->title, 80) }}
+                                </a>
+                            </h4>
+                            <p>{{ Str::limit($featured->excerpt, 100) }}</p>
+                            <a href="{{ $featured->external_url ?? '#' }}" 
+                               target="_blank" 
+                               class="btn-main btn-sm">
+                                Read Full Article <i class="fa fa-external-link"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
-    </div>
-</section>
-@endif
-
-<!-- Main News Section -->
-<section id="section-news" class="pt40 pb80" aria-label="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <!-- News Layout Options -->
-                <div class="row align-items-center mb40">
-                    <div class="col-md-6">
-                        <h3>Latest News</h3>
-                    </div>
-                    <div class="col-md-6 text-right">
-                        <div class="view-options">
-                            <span class="mr-2">View:</span>
-                            <a href="{{ route('news.grid-no-sidebar') }}" class="btn btn-sm btn-outline-primary">Grid</a>
-                            <a href="{{ route('news.standard-no-sidebar') }}" class="btn btn-sm btn-outline-primary">List</a>
-                        </div>
-                    </div>
+        
+        <!-- Pagination / Load More News -->
+        <div class="row mt-5">
+            <div class="col-lg-12 text-center">
+                <h4 class="mb-3">Explore More News</h4>
+                <div class="btn-group" role="group">
+                    <a href="{{ route('news.index', array_merge(request()->all(), ['page' => 1])) }}" 
+                       class="btn {{ (!request('page') || request('page') == 1) ? 'btn-primary' : 'btn-outline-primary' }}">
+                        Page 1
+                    </a>
+                    <a href="{{ route('news.index', array_merge(request()->all(), ['page' => 2])) }}" 
+                       class="btn {{ request('page') == 2 ? 'btn-primary' : 'btn-outline-primary' }}">
+                        Page 2
+                    </a>
+                    <a href="{{ route('news.index', array_merge(request()->all(), ['page' => 3])) }}" 
+                       class="btn {{ request('page') == 3 ? 'btn-primary' : 'btn-outline-primary' }}">
+                        Page 3
+                    </a>
+                    <a href="{{ route('news.index', array_merge(request()->all(), ['page' => 4])) }}" 
+                       class="btn {{ request('page') == 4 ? 'btn-primary' : 'btn-outline-primary' }}">
+                        Page 4
+                    </a>
+                    <a href="{{ route('news.index', array_merge(request()->all(), ['page' => 5])) }}" 
+                       class="btn {{ request('page') == 5 ? 'btn-primary' : 'btn-outline-primary' }}">
+                        Page 5
+                    </a>
                 </div>
-
-                <!-- News Articles Grid -->
-                <div class="row">
-                    @forelse($news as $article)
-                    <div class="col-lg-6 mb30">
-                        <div class="bloglist s2 item">
-                            <div class="post-content">
-                                <div class="post-image">
-                                    <div class="date-box">
-                                        <div class="m">{{ $article->published_at->format('d') }}</div>
-                                        <div class="d">{{ $article->published_at->format('M') }}</div>
-                                    </div>
-                                    <img alt="{{ $article->title }}" 
-                                         src="{{ $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
-                                         class="lazy">
-                                </div>
-                                <div class="post-text">                           
-                                    <h4><a href="{{ route('news.show', $article->slug) }}">{{ $article->title }}<span></span></a></h4>
-                                    <p>{{ Str::limit($article->excerpt ?: strip_tags($article->content), 120) }}</p>
-                                    <a class="btn-main" href="{{ route('news.show', $article->slug) }}">Read More</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-12">
-                        <div class="text-center py80">
-                            <i class="fa fa-newspaper-o fa-5x text-muted mb30"></i>
-                            <h4>No News Articles Yet</h4>
-                            <p class="lead">We're working on bringing you the latest news and updates. Check back soon!</p>
-                        </div>
-                    </div>
-                    @endforelse
-                </div>
-
-                <!-- Pagination -->
-                @if($news->hasPages())
-                <div class="spacer-single"></div>
-                <div class="col-md-12">
-                    <ul class="pagination">
-                        {{-- Previous Page Link --}}
-                        @if ($news->onFirstPage())
-                            <li class="disabled"><span>Prev</span></li>
-                        @else
-                            <li><a href="{{ $news->previousPageUrl() }}" rel="prev">Prev</a></li>
-                        @endif
-
-                        {{-- Pagination Elements --}}
-                        @foreach ($news->getUrlRange(1, $news->lastPage()) as $page => $url)
-                            @if ($page == $news->currentPage())
-                                <li class="active"><span>{{ $page }}</span></li>
-                            @else
-                                <li><a href="{{ $url }}">{{ $page }}</a></li>
-                            @endif
-                        @endforeach
-
-                        {{-- Next Page Link --}}
-                        @if ($news->hasMorePages())
-                            <li><a href="{{ $news->nextPageUrl() }}" rel="next">Next</a></li>
-                        @else
-                            <li class="disabled"><span>Next</span></li>
-                        @endif
-                    </ul>
-                </div>
-                @endif
-            </div>
-
-            <div class="col-lg-4">
-                <!-- Categories Widget -->
-                <div class="widget widget_categories">
-                    <h4>Categories</h4>
-                    <div class="small-border"></div>
-                    <ul>
-                        @foreach($categories as $key => $name)
-                        <li><a href="{{ route('news.category', $key) }}">{{ $name }}</a></li>
-                        @endforeach
-                    </ul>
-                </div>
-
-                <!-- Newsletter Widget -->
-                <div class="widget widget-newsletter">
-                    <h4>Newsletter</h4>
-                    <div class="small-border"></div>
-                    <p>Subscribe to our newsletter and get the latest updates delivered to your inbox.</p>
-                    <form id="newsletter-form" action="{{ route('newsletter.subscribe') }}" method="POST">
-                        @csrf
-                        <div class="input-group mb10">
-                            <input type="email" name="email" class="form-control" placeholder="Your email address" required>
-                        </div>
-                        <button type="submit" class="btn-main btn-fullwidth">Subscribe</button>
-                    </form>
-                </div>
-
-                <!-- Layout Options Widget -->
-                <div class="widget">
-                    <h4>Browse News</h4>
-                    <div class="small-border"></div>
-                    <div class="layout-options">
-                        <h6>Grid Layouts</h6>
-                        <ul class="list-unstyled">
-                            <li><a href="{{ route('news.grid-left-sidebar') }}"><i class="fa fa-th-large"></i> Grid - Left Sidebar</a></li>
-                            <li><a href="{{ route('news.grid-right-sidebar') }}"><i class="fa fa-th-large"></i> Grid - Right Sidebar</a></li>
-                            <li><a href="{{ route('news.grid-no-sidebar') }}"><i class="fa fa-th-large"></i> Grid - No Sidebar</a></li>
-                        </ul>
-                        
-                        <h6 class="mt20">Standard Layouts</h6>
-                        <ul class="list-unstyled">
-                            <li><a href="{{ route('news.standard-left-sidebar') }}"><i class="fa fa-list"></i> Standard - Left Sidebar</a></li>
-                            <li><a href="{{ route('news.standard-right-sidebar') }}"><i class="fa fa-list"></i> Standard - Right Sidebar</a></li>
-                            <li><a href="{{ route('news.standard-no-sidebar') }}"><i class="fa fa-list"></i> Standard - No Sidebar</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Search Widget -->
-                <div class="widget widget-search">
-                    <h4>Search News</h4>
-                    <div class="small-border"></div>
-                    <form action="{{ route('news.search') }}" method="GET">
-                        <div class="input-group">
-                            <input type="text" 
-                                   name="q" 
-                                   class="form-control" 
-                                   placeholder="Search articles..." 
-                                   value="{{ request('q') }}">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                <p class="mt-3 text-muted">
+                    <small>Each page loads different car news articles from trusted sources</small>
+                </p>
             </div>
         </div>
     </div>
 </section>
+@else
+<section id="section-featured" class="pt80 pb80">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <i class="fa fa-newspaper-o fa-5x text-muted mb30"></i>
+                <h3>No News Available</h3>
+                <p class="lead">Unable to fetch news at the moment. Please try again later.</p>
+                <a href="{{ route('home') }}" class="btn-main mt-3">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
 
 <!-- Call to Action Section -->
 <section id="section-call-to-action" class="bg-color-2 pt60 pb60 text-light">
@@ -272,12 +183,81 @@
 .empty-state i {
     margin-bottom: 30px;
 }
+
+/* Smooth fade-in animation for news articles */
+.bloglist.item {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.bloglist.item:nth-child(1) { animation-delay: 0.1s; }
+.bloglist.item:nth-child(2) { animation-delay: 0.2s; }
+.bloglist.item:nth-child(3) { animation-delay: 0.3s; }
+.bloglist.item:nth-child(4) { animation-delay: 0.4s; }
+.bloglist.item:nth-child(5) { animation-delay: 0.5s; }
+.bloglist.item:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading spinner */
+.news-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    display: none;
+}
+
+.news-loading.active {
+    display: block;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Smooth scroll to top when clicking pagination
+    $('.btn-group a[href*="page="]').on('click', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        
+        // Show loading spinner
+        $('body').append('<div class="news-loading active"><div class="spinner"></div></div>');
+        
+        // Smooth scroll to top
+        $('html, body').animate({
+            scrollTop: $('#section-featured').offset().top - 100
+        }, 600, function() {
+            // Navigate to the page after scroll
+            window.location.href = url;
+        });
+    });
+    
     // Newsletter subscription
     $('#newsletter-form').on('submit', function(e) {
         e.preventDefault();

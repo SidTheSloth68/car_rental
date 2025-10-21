@@ -132,7 +132,7 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="h5 text-success font-weight-bold">${{ number_format($car->daily_rate, 2) }}</span>
+                                    <span class="h5 text-success font-weight-bold">৳{{ number_format($car->daily_rate * 110, 0) }}</span>
                                     <small class="text-muted">/day</small>
                                 </div>
                                 @if($car->license_plate)

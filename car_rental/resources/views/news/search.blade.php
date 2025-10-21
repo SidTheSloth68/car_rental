@@ -84,7 +84,7 @@
                             <div class="col-md-4">
                                 <div class="result-image">
                                     <img alt="{{ $article->title }}" 
-                                         src="{{ $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
+                                         src="{{ $article->featured_image ? asset($article->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
                                          class="img-fullwidth">
                                 </div>
                             </div>

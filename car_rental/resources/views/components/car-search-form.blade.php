@@ -4,8 +4,8 @@
     <div id="step-1" class="row">
         <div class="col-md-12 mb-3">
             <h4>{{ $formTitle ?? 'Find Your Perfect Car' }}</h4>
-            @if($showPlaceholder ?? true)
-                <p class="text-muted mb-4">Car search functionality will be implemented in upcoming commits</p>
+            @if($showPlaceholder ?? false)
+                <p class="text-muted mb-4">Search for available cars by entering your rental details below</p>
             @endif
             
             <div class="row">
@@ -18,7 +18,7 @@
                         id="pickup_location"
                         placeholder="Enter location" 
                         value="{{ old('pickup_location', $pickupLocation ?? '') }}"
-                        {{ ($disabled ?? true) ? 'disabled' : '' }}
+                        {{ ($disabled ?? false) ? 'disabled' : '' }}
                     >
                     @error('pickup_location')
                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -34,7 +34,7 @@
                         id="dropoff_location"
                         placeholder="Enter location" 
                         value="{{ old('dropoff_location', $dropoffLocation ?? '') }}"
-                        {{ ($disabled ?? true) ? 'disabled' : '' }}
+                        {{ ($disabled ?? false) ? 'disabled' : '' }}
                     >
                     @error('dropoff_location')
                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -50,7 +50,7 @@
                         id="pickup_date"
                         value="{{ old('pickup_date', $pickupDate ?? '') }}"
                         min="{{ date('Y-m-d') }}"
-                        {{ ($disabled ?? true) ? 'disabled' : '' }}
+                        {{ ($disabled ?? false) ? 'disabled' : '' }}
                     >
                     @error('pickup_date')
                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -66,7 +66,7 @@
                         id="return_date"
                         value="{{ old('return_date', $returnDate ?? '') }}"
                         min="{{ date('Y-m-d') }}"
-                        {{ ($disabled ?? true) ? 'disabled' : '' }}
+                        {{ ($disabled ?? false) ? 'disabled' : '' }}
                     >
                     @error('return_date')
                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -78,7 +78,7 @@
                     <button 
                         type="submit" 
                         class="btn btn-main w-100"
-                        {{ ($disabled ?? true) ? 'disabled' : '' }}
+                        {{ ($disabled ?? false) ? 'disabled' : '' }}
                     >
                         {{ $buttonText ?? 'Search Cars' }}
                     </button>
@@ -93,7 +93,7 @@
                             class="form-control" 
                             name="car_type"
                             id="car_type"
-                            {{ ($disabled ?? true) ? 'disabled' : '' }}
+                            {{ ($disabled ?? false) ? 'disabled' : '' }}
                         >
                             <option value="">Any Type</option>
                             <option value="economy" {{ old('car_type') == 'economy' ? 'selected' : '' }}>Economy</option>
@@ -111,13 +111,13 @@
                             class="form-control" 
                             name="price_range"
                             id="price_range"
-                            {{ ($disabled ?? true) ? 'disabled' : '' }}
+                            {{ ($disabled ?? false) ? 'disabled' : '' }}
                         >
                             <option value="">Any Price</option>
-                            <option value="0-50" {{ old('price_range') == '0-50' ? 'selected' : '' }}>$0 - $50</option>
-                            <option value="50-100" {{ old('price_range') == '50-100' ? 'selected' : '' }}>$50 - $100</option>
-                            <option value="100-200" {{ old('price_range') == '100-200' ? 'selected' : '' }}>$100 - $200</option>
-                            <option value="200+" {{ old('price_range') == '200+' ? 'selected' : '' }}>$200+</option>
+                            <option value="0-50" {{ old('price_range') == '0-50' ? 'selected' : '' }}>৳0 - ৳5,500</option>
+                            <option value="50-100" {{ old('price_range') == '50-100' ? 'selected' : '' }}>৳5,500 - ৳11,000</option>
+                            <option value="100-200" {{ old('price_range') == '100-200' ? 'selected' : '' }}>৳11,000 - ৳22,000</option>
+                            <option value="200+" {{ old('price_range') == '200+' ? 'selected' : '' }}>৳22,000+</option>
                         </select>
                     </div>
                 </div>

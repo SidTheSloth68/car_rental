@@ -87,14 +87,14 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Total Revenue</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ number_format($revenue_stats['total_revenue'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">৳{{ number_format($revenue_stats['total_revenue'] * 110, 0) }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            <i class="fas fa-bangladeshi-taka-sign fa-2x text-gray-300"></i>
                         </div>
                     </div>
                     <div class="mt-2 text-sm">
-                        This month: <span class="text-success">${{ number_format($revenue_stats['monthly_revenue'], 2) }}</span>
+                        This month: <span class="text-success">৳{{ number_format($revenue_stats['monthly_revenue'] * 110, 0) }}</span>
                     </div>
                 </div>
             </div>
@@ -153,7 +153,7 @@
                                 <div class="font-weight-bold">{{ $car->make }} {{ $car->model }}</div>
                                 <div class="text-muted small">{{ $car->year }} - {{ ucfirst($car->type) }}</div>
                                 <div class="text-muted small">
-                                    ${{ number_format($car->daily_rate, 2) }}/day - 
+                                    ৳{{ number_format($car->daily_rate * 110, 0) }}/day - 
                                     <span class="badge badge-{{ $car->available ? 'success' : 'danger' }}">
                                         {{ $car->available ? 'Available' : 'Unavailable' }}
                                     </span>
@@ -203,7 +203,7 @@
                                                 {{ ucfirst($booking->status) }}
                                             </span>
                                         </td>
-                                        <td>${{ number_format($booking->final_amount ?? 0, 2) }}</td>
+                                        <td>৳{{ number_format($booking->final_amount ?? 0 * 110, 0) }}</td>
                                         <td>{{ $booking->created_at->format('M d, Y') }}</td>
                                     </tr>
                                 @empty

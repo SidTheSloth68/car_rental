@@ -40,22 +40,10 @@
     </li>
     <li><a class="menu-item" href="{{ route('news.index') }}">News</a>
         <ul>
-            <li><a class="menu-item" href="#">News Grid</a>
-                <ul>
-                    <li><a class="menu-item" href="{{ route('news.grid-left-sidebar') }}">Left Sidebar</a></li>
-                    <li><a class="menu-item" href="{{ route('news.grid-right-sidebar') }}">Right Sidebar</a></li>
-                    <li><a class="menu-item" href="{{ route('news.grid-no-sidebar') }}">No Sidebar</a></li>
-                </ul>
-            </li>
-            <li><a class="menu-item" href="#">News Standard</a>
-                <ul>
-                    <li><a class="menu-item" href="{{ route('news.standard-left-sidebar') }}">Left Sidebar</a></li>
-                    <li><a class="menu-item" href="{{ route('news.standard-right-sidebar') }}">Right Sidebar</a></li>
-                    <li><a class="menu-item" href="{{ route('news.standard-no-sidebar') }}">No Sidebar</a></li>
-                </ul>
-            </li>
-        </ul>
-    </li>
+            <li><a class="menu-item" href="{{ route('news.index') }}">All News</a></li>
+            <li><a class="menu-item" href="{{ route('news.external') }}">Live Car News (API)</a></li>
+            <li><a class="menu-item" href="{{ route('news.grid-no-sidebar') }}">Grid View</a></li>
+            <li><a class="menu-item" href="{{ route('news.standard-no-sidebar') }}">List View</a></li>
         </ul>
     </li>
     <li><a class="menu-item" href="#">Elements</a>

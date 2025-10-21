@@ -43,7 +43,7 @@
                                 <div class="d">{{ $featured->published_at->format('M') }}</div>
                             </div>
                             <img alt="{{ $featured->title }}" 
-                                 src="{{ $featured->featured_image ? asset('storage/' . $featured->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
+                                 src="{{ $featured->featured_image ? asset($featured->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
                                  class="lazy">
                         </div>
                         <div class="post-text">
@@ -88,7 +88,7 @@
                                         <div class="d">{{ $article->published_at->format('M') }}</div>
                                     </div>
                                     <img alt="{{ $article->title }}" 
-                                         src="{{ $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
+                                         src="{{ $article->featured_image ? asset($article->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
                                          class="lazy">
                                 </div>
                                 <div class="post-text">                           

@@ -455,7 +455,7 @@ class CarApiController extends Controller
             'weekly_rate' => $car->weekly_rate,
             'monthly_rate' => $car->monthly_rate,
             'image' => $car->image,
-            'images' => $car->images ? json_decode($car->images, true) : [],
+            'images' => $car->images ?: [],
             'is_available' => $car->is_available,
             'is_featured' => $car->is_featured,
             'location' => $car->location,

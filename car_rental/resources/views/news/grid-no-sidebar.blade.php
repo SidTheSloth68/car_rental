@@ -35,7 +35,7 @@
                                 <div class="d">{{ $article->published_at->format('M') }}</div>
                             </div>
                             <img alt="{{ $article->title }}" 
-                                 src="{{ $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
+                                 src="{{ $article->featured_image ? asset($article->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
                                  class="lazy">
                         </div>
                         <div class="post-text">                           

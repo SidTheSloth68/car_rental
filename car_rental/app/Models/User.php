@@ -70,4 +70,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(Booking::class);
     }
+
+    /**
+     * Check if the user has a specific role.
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if the user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * Check if the user is a regular user/customer.
+     */
+    public function isUser(): bool
+    {
+        return $this->hasRole('user') || $this->hasRole('customer');
+    }
 }

@@ -291,6 +291,14 @@ class Car extends Model
     }
 
     /**
+     * Mutator for price_per_day to map to daily_rate
+     */
+    public function setPricePerDayAttribute($value)
+    {
+        $this->attributes['daily_rate'] = $value;
+    }
+
+    /**
      * Accessor for images to provide gallery or image
      */
     public function getImagesAttribute()

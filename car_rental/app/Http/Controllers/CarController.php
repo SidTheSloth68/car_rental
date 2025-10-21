@@ -10,11 +10,25 @@ use Illuminate\Http\RedirectResponse;
 class CarController extends Controller
 {
     /**
+     * Apply middleware to controller methods
+     */
+    public function __construct()
+    {
+        // Require authentication for viewing car details (booking form)
+        $this->middleware('auth')->only(['show']);
+    }
+
+    /**
      * Display a listing of cars
      */
     public function index(Request $request): View
     {
         $query = Car::query();
+
+        // For guests and non-admin users, only show available cars
+        if (!auth()->check() || !auth()->user()->hasRole('admin')) {
+            $query->available();
+        }
 
         // Filter by car type
         if ($request->filled('car_type')) {
@@ -44,6 +58,30 @@ class CarController extends Controller
             $query->where('location', 'like', '%' . $request->location . '%');
         }
 
+        // Filter by date availability - check if car is not booked during requested dates
+        if ($request->filled('pickup_date') && $request->filled('return_date')) {
+            $pickupDate = $request->pickup_date;
+            $returnDate = $request->return_date;
+            
+            // Get IDs of cars that have conflicting bookings
+            $bookedCarIds = \App\Models\Booking::where(function($q) use ($pickupDate, $returnDate) {
+                $q->whereBetween('start_date', [$pickupDate, $returnDate])
+                  ->orWhereBetween('end_date', [$pickupDate, $returnDate])
+                  ->orWhere(function($q) use ($pickupDate, $returnDate) {
+                      $q->where('start_date', '<=', $pickupDate)
+                        ->where('end_date', '>=', $returnDate);
+                  });
+            })
+            ->whereIn('status', ['pending', 'confirmed', 'active'])
+            ->pluck('car_id')
+            ->toArray();
+            
+            // Exclude booked cars
+            if (!empty($bookedCarIds)) {
+                $query->whereNotIn('id', $bookedCarIds);
+            }
+        }
+
         // Search by make or model
         if ($request->filled('search')) {
             $search = $request->search;
@@ -68,7 +106,18 @@ class CarController extends Controller
 
         $cars = $query->paginate(12);
 
-        return view('cars.index', compact('cars'));
+        // Pass search parameters to view for display
+        $searchParams = [
+            'pickup_location' => $request->pickup_location,
+            'dropoff_location' => $request->dropoff_location,
+            'pickup_date' => $request->pickup_date,
+            'return_date' => $request->return_date,
+            'car_type' => $request->car_type,
+            'fuel_type' => $request->fuel_type,
+            'search' => $request->search,
+        ];
+
+        return view('cars.index', compact('cars', 'searchParams'));
     }
 
     /**

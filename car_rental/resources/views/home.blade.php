@@ -91,6 +91,57 @@
         </div>
     </section>
 
+    <!-- How It Works Section -->
+    <section aria-label="section" class="jarallax">
+        <img src="{{ asset('images/background/3.jpg') }}" class="jarallax-img" alt="">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-12 text-center mb-4">
+                    <h2 class="text-light">How It Works</h2>
+                    <p class="text-light">Rent a car in 4 simple steps</p>
+                    <div class="spacer-20"></div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <!-- Step 1 -->
+                <div class="col-lg-3 col-md-6 text-center wow fadeInUp" data-wow-delay="0s">
+                    <div class="de-step-box" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 15px; height: 100%;">
+                        <div class="d-step-number" style="background: #8bc34a; color: white; width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 20px;">1</div>
+                        <h4 class="text-light mb-3">Choose a vehicle</h4>
+                        <p class="text-light" style="opacity: 0.9;">Unlock unparalleled adventures and memorable journeys with our vast fleet of vehicles tailored to suit every need, taste, and destination.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="col-lg-3 col-md-6 text-center wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="de-step-box" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 15px; height: 100%;">
+                        <div class="d-step-number" style="background: #8bc34a; color: white; width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 20px;">2</div>
+                        <h4 class="text-light mb-3">Pick location & date</h4>
+                        <p class="text-light" style="opacity: 0.9;">Pick your ideal location and date, and let us take you on a journey filled with convenience, flexibility, and unforgettable experiences.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="col-lg-3 col-md-6 text-center wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="de-step-box" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 15px; height: 100%;">
+                        <div class="d-step-number" style="background: #8bc34a; color: white; width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 20px;">3</div>
+                        <h4 class="text-light mb-3">Make a booking</h4>
+                        <p class="text-light" style="opacity: 0.9;">Secure your reservation with ease, unlocking a world of possibilities and embarking on your next adventure with confidence.</p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="col-lg-3 col-md-6 text-center wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="de-step-box" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 15px; height: 100%;">
+                        <div class="d-step-number" style="background: #8bc34a; color: white; width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 20px;">4</div>
+                        <h4 class="text-light mb-3">Sit back & relax</h4>
+                        <p class="text-light" style="opacity: 0.9;">Hassle-free convenience as we take care of every detail, allowing you to unwind and embrace a journey filled with comfort.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Our Features Section -->
     <section aria-label="section">
         <div class="container">
@@ -158,25 +209,25 @@
             <div class="row text-center">
                 <div class="col-md-3 col-sm-6 mb-sm-30">
                     <div class="de_count transparent text-light wow fadeInUp">
-                        <h3 class="timer" data-to="15425" data-speed="3000">0</h3>
+                        <h3 class="timer" data-to="2500" data-speed="3000">0</h3>
                         Completed Orders
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 mb-sm-30">
                     <div class="de_count transparent text-light wow fadeInUp">
-                        <h3 class="timer" data-to="8745" data-speed="3000">0</h3>
+                        <h3 class="timer" data-to="1850" data-speed="3000">0</h3>
                         Happy Customers
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 mb-sm-30">
                     <div class="de_count transparent text-light wow fadeInUp">
-                        <h3 class="timer" data-to="235" data-speed="3000">0</h3>
+                        <h3 class="timer" data-to="45" data-speed="3000">0</h3>
                         Vehicles Fleet
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 mb-sm-30">
                     <div class="de_count transparent text-light wow fadeInUp">
-                        <h3 class="timer" data-to="15" data-speed="3000">0</h3>
+                        <h3 class="timer" data-to="8" data-speed="3000">0</h3>
                         Years Experience
                     </div>
                 </div>
@@ -218,8 +269,8 @@
                                             </ul>
                                         </div>
                                         <div class="d-price">
-                                            Daily rate from <span>${{ $car['price'] }}</span>
-                                            <a class="btn-main" href="#">Rent Now</a>
+                                            Daily rate from <span>৳{{ number_format($car['price'] * 110, 0) }}</span>
+                                            <a class="btn-main" href="{{ route('booking.create.car', $car['id']) }}">Rent Now</a>
                                         </div>
                                     </div>
                                 </div>
@@ -248,8 +299,8 @@
                                             </ul>
                                         </div>
                                         <div class="d-price">
-                                            Daily rate from <span>$265</span>
-                                            <a class="btn-main" href="#">Rent Now</a>
+                                            Daily rate from <span>৳29,150</span>
+                                            <a class="btn-main" href="{{ route('cars.index') }}">Rent Now</a>
                                         </div>
                                     </div>
                                 </div>
@@ -305,13 +356,14 @@
                         <div class="bloglist s2 item">
                             <div class="post-content">
                                 <div class="post-image">
-                                    <img alt="" src="{{ asset('images/news/' . $news['image']) }}" class="lazy">
+                                    <img alt="{{ $news['title'] }}" src="{{ asset($news['image']) }}" class="lazy">
                                 </div>
                                 <div class="post-text">
                                     <span class="p-tagline">{{ $news['category'] }}</span>
                                     <span class="p-date">{{ $news['date'] }}</span>
-                                    <h4><a href="#">{{ $news['title'] }}</a></h4>
+                                    <h4><a href="{{ route('news.show', $news['slug']) }}">{{ $news['title'] }}</a></h4>
                                     <p>{{ $news['excerpt'] }}</p>
+                                    <a class="btn-main" href="{{ route('news.show', $news['slug']) }}">Read More</a>
                                 </div>
                             </div>
                         </div>
@@ -335,6 +387,13 @@
                         </div>
                     </div>
                 @endif
+            </div>
+            
+            <!-- View All News Button -->
+            <div class="row mt-4">
+                <div class="col-lg-12 text-center">
+                    <a class="btn-main" href="{{ route('news.index') }}">View All News</a>
+                </div>
             </div>
         </div>
     </section>

@@ -17,12 +17,17 @@ class DatabaseSeeder extends Seeder
 
         // Seed users first (required for news authors)
         $this->call([
-            UserSeeder::class,
+            SimpleUserSeeder::class,
         ]);
 
         // Seed cars data
         $this->call([
             CarSeeder::class,
+        ]);
+
+        // Seed bookings (requires users and cars)
+        $this->call([
+            BookingSeeder::class,
         ]);
 
         // Seed news articles (requires users for authors)

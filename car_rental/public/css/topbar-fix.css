@@ -1,0 +1,53 @@
+/* Topbar Alignment Fix - Centers Login/Signup buttons vertically */
+
+#topbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#topbar .topbar-left,
+#topbar .topbar-right {
+    display: flex;
+    align-items: center;
+}
+
+#topbar .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#topbar .topbar-right .social-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 15px;
+}
+
+#topbar .topbar-right .topbar-widget {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+}
+
+#topbar .topbar-right .topbar-widget a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+}
+
+/* Social icons styling */
+#topbar .social-icons i {
+    background: none;
+    margin: 0;
+    margin-top: 0px;
+    color: #ffffff;
+}
+
+/* Ensure consistent height for all topbar elements */
+#topbar .topbar-left .topbar-widget,
+#topbar .topbar-right .social-icons a {
+    display: inline-flex;
+    align-items: center;
+}

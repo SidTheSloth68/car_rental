@@ -104,19 +104,19 @@
                                 <tbody>
                                     <tr>
                                         <td>Toyota Camry</td>
-                                        <td>$45/day</td>
+                                        <td>৳4,950/day</td>
                                         <td><span class="badge bg-success">Available</span></td>
                                         <td><button class="btn btn-sm btn-outline-primary">Book Now</button></td>
                                     </tr>
                                     <tr>
                                         <td>Honda Civic</td>
-                                        <td>$38/day</td>
+                                        <td>৳4,180/day</td>
                                         <td><span class="badge bg-warning">Limited</span></td>
                                         <td><button class="btn btn-sm btn-outline-primary">Book Now</button></td>
                                     </tr>
                                     <tr>
                                         <td>BMW 3 Series</td>
-                                        <td>$85/day</td>
+                                        <td>৳9,350/day</td>
                                         <td><span class="badge bg-danger">Unavailable</span></td>
                                         <td><button class="btn btn-sm btn-outline-secondary" disabled>Unavailable</button></td>
                                     </tr>

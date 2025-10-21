@@ -14,11 +14,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Car routes - accessible to all users
 Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
 Route::post('/cars/search', [CarController::class, 'search'])->name('cars.search');
-Route::get('/cars/{id}', [CarController::class, 'show'])->name('cars.show');
+Route::get('/cars/{car}', [CarController::class, 'show'])->name('cars.show');
 Route::get('/cars-list', [CarController::class, 'list'])->name('cars.list');
 
 // Booking routes - accessible to all users but require auth to submit
 Route::get('/booking', [BookingController::class, 'create'])->name('booking.create');
+Route::get('/cars/{car}/book', [BookingController::class, 'createForCar'])->name('booking.create.car');
 Route::get('/quick-booking', [BookingController::class, 'quickBooking'])->name('booking.quick');
 
 // About and Contact pages
@@ -31,6 +32,7 @@ Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'
 
 // News/Blog routes
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+Route::get('/news/external', [NewsController::class, 'externalNews'])->name('news.external');
 Route::get('/news/search', [NewsController::class, 'search'])->name('news.search');
 Route::get('/news/category/{category}', [NewsController::class, 'category'])->name('news.category');
 
@@ -80,7 +82,9 @@ Route::middleware('auth')->group(function () {
     
     // Booking routes
     Route::resource('bookings', BookingController::class);
-    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::post('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
+    Route::get('/bookings/{booking}/receipt', [BookingController::class, 'receipt'])->name('bookings.receipt');
     Route::get('/booking-summary', [BookingController::class, 'getSummary'])->name('bookings.summary');
     
     // Admin News management routes
@@ -91,6 +95,9 @@ Route::middleware('auth')->group(function () {
         'update' => 'admin.news.update',
         'destroy' => 'admin.news.destroy'
     ]);
+    
+    // Admin: Import news from external API
+    Route::get('/news/import-api', [NewsController::class, 'importFromApi'])->name('news.import-api');
 });
 
 // Admin routes - require authentication and admin role
@@ -109,6 +116,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Booking Management
     Route::get('/bookings', [\App\Http\Controllers\Admin\AdminController::class, 'bookings'])->name('bookings');
     Route::get('/bookings/{booking}', [\App\Http\Controllers\Admin\AdminController::class, 'showBooking'])->name('bookings.show');
+    Route::patch('/bookings/{booking}', [\App\Http\Controllers\Admin\AdminController::class, 'updateBooking'])->name('bookings.update');
     Route::patch('/bookings/{booking}/status', [\App\Http\Controllers\Admin\AdminController::class, 'updateBookingStatus'])->name('bookings.update-status');
     
     // News Management

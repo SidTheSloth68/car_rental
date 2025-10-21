@@ -21,17 +21,18 @@ class News extends Model
         'excerpt',
         'content',
         'featured_image',
-        'gallery',
+        'images',
         'category',
         'tags',
         'author_id',
         'published_at',
-        'is_published',
+        'status',
         'is_featured',
         'meta_title',
         'meta_description',
         'views_count',
         'likes_count',
+        'comments_count',
         'reading_time'
     ];
 
@@ -41,13 +42,13 @@ class News extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'gallery' => 'array',
+        'images' => 'array',
         'tags' => 'array',
         'published_at' => 'datetime',
-        'is_published' => 'boolean',
         'is_featured' => 'boolean',
         'views_count' => 'integer',
         'likes_count' => 'integer',
+        'comments_count' => 'integer',
         'reading_time' => 'integer',
         'deleted_at' => 'datetime'
     ];
@@ -135,7 +136,7 @@ class News extends Model
      */
     public function scopePublished($query)
     {
-        return $query->where('is_published', true)
+        return $query->where('status', 'published')
                     ->where('published_at', '<=', now());
     }
 

@@ -81,6 +81,58 @@ class BookingApiController extends Controller
     }
 
     /**
+     * Get authenticated user's bookings.
+     */
+    public function userBookings(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Authentication required'
+                ], 401);
+            }
+
+            $bookings = $user->bookings()
+                ->with('car')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+                return response()->json([
+                'success' => true,
+                'data' => $bookings->map(function ($booking) {
+                    return [
+                        'id' => $booking->id,
+                        'booking_number' => $booking->booking_number,
+                        'car' => [
+                            'id' => $booking->car->id,
+                            'make' => $booking->car->make,
+                            'model' => $booking->car->model,
+                            'year' => $booking->car->year,
+                        ],
+                        'start_date' => $booking->pickup_date,
+                        'end_date' => $booking->return_date,
+                        'pickup_location' => $booking->pickup_location,
+                        'dropoff_location' => $booking->dropoff_location,
+                        'status' => $booking->status,
+                        'total_amount' => $booking->total_amount,
+                        'final_amount' => $booking->final_amount,
+                        'created_at' => $booking->created_at,
+                        'updated_at' => $booking->updated_at,
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch bookings',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Store a newly created booking.
      */
     public function store(BookingRequest $request): JsonResponse

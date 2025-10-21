@@ -166,7 +166,7 @@
                                 </div>
                             </div>
                             <div class="d-price">
-                                Daily rate from <span>${{ $car['daily_rate'] }}</span>
+                                Daily rate from <span>৳{{ number_format($car['daily_rate'] * 110, 0) }}</span>
                                 <a class="btn-main" href="#">Rent Now</a>
                             </div>
                             <div class="clearfix"></div>

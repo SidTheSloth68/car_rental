@@ -22,93 +22,7 @@
 <section id="section-cars">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3">
-                <!-- Filter Form -->
-                <form method="GET" action="{{ route('cars.list') }}" id="filter-form">
-                    <div class="item_filter_group">
-                        <h4>Vehicle Type</h4>
-                        <div class="de_form">
-                            @php
-                                $vehicleTypes = ['sedan' => 'Sedan', 'suv' => 'SUV', 'hatchback' => 'Hatchback', 'convertible' => 'Convertible'];
-                            @endphp
-                            @foreach($vehicleTypes as $value => $label)
-                            <div class="de_checkbox">
-                                <input id="vehicle_type_{{ $value }}" name="car_type[]" type="checkbox" value="{{ $value }}" 
-                                       {{ in_array($value, request('car_type', [])) ? 'checked' : '' }}>
-                                <label for="vehicle_type_{{ $value }}">{{ $label }}</label>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="item_filter_group">
-                        <h4>Car Body Type</h4>
-                        <div class="de_form">
-                            @php
-                                $bodyTypes = ['convertible' => 'Convertible', 'coupe' => 'Coupe', 'luxury' => 'Luxury Cars', 'hatchback' => 'Hatchback', 'minivan' => 'Minivan', 'pickup' => 'Pickup', 'sedan' => 'Sedan', 'sports' => 'Sports Car', 'wagon' => 'Station Wagon', 'suv' => 'SUV'];
-                            @endphp
-                            @foreach($bodyTypes as $value => $label)
-                            <div class="de_checkbox">
-                                <input id="car_body_type_{{ $value }}" name="car_type[]" type="checkbox" value="{{ $value }}"
-                                       {{ in_array($value, request('car_type', [])) ? 'checked' : '' }}>
-                                <label for="car_body_type_{{ $value }}">{{ $label }}</label>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="item_filter_group">
-                        <h4>Car Seats</h4>
-                        <div class="de_form">
-                            @foreach([2, 4, 5, 7, 8] as $seatCount)
-                            <div class="de_checkbox">
-                                <input id="car_seat_{{ $seatCount }}" name="seats[]" type="checkbox" value="{{ $seatCount }}"
-                                       {{ in_array($seatCount, request('seats', [])) ? 'checked' : '' }}>
-                                <label for="car_seat_{{ $seatCount }}">{{ $seatCount }} seats</label>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="item_filter_group">
-                        <h4>Fuel Type</h4>
-                        <div class="de_form">
-                            @php
-                                $fuelTypes = ['gasoline' => 'Gasoline', 'diesel' => 'Diesel', 'electric' => 'Electric', 'hybrid' => 'Hybrid'];
-                            @endphp
-                            @foreach($fuelTypes as $value => $label)
-                            <div class="de_checkbox">
-                                <input id="fuel_type_{{ $value }}" name="fuel_type[]" type="checkbox" value="{{ $value }}"
-                                       {{ in_array($value, request('fuel_type', [])) ? 'checked' : '' }}>
-                                <label for="fuel_type_{{ $value }}">{{ $label }}</label>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="item_filter_group">
-                        <h4>Price ($)</h4>
-                        <div class="price-input">
-                            <div class="field">
-                                <span>Min</span>
-                                <input type="number" class="input-min" name="min_price" value="{{ request('min_price') }}" placeholder="0">
-                            </div>
-                            <div class="separator">-</div>
-                            <div class="field">
-                                <span>Max</span>
-                                <input type="number" class="input-max" name="max_price" value="{{ request('max_price') }}" placeholder="1000">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="item_filter_group">
-                        <button type="submit" class="btn-main btn-fullwidth">Apply Filters</button>
-                        <a href="{{ route('cars.list') }}" class="btn-main btn-fullwidth mt-2">Clear Filters</a>
-                    </div>
-                </form>
-            </div>
-
-            <div class="col-lg-9">
+            <div class="col-lg-12">
                 <!-- View Toggle & Sort Options -->
                 <div class="row mb-4">
                     <div class="col-md-6">
@@ -214,13 +128,17 @@
                                     @endif
                                     @if($car->deposit_required)
                                     <div class="text-info small mb-1">
-                                        Deposit: ${{ number_format($car->deposit_required, 0) }}
+                                        Deposit: ৳{{ number_format($car->deposit_required * 110, 0) }}
                                     </div>
                                     @endif
                                 </div>
-                                Daily rate from <span>${{ number_format($car->price_per_day, 0) }}</span>
+                                Daily rate from <span>৳{{ number_format($car->price_per_day * 110, 0) }}</span>
                                 @if($car->is_available)
-                                    <a class="btn-main" href="{{ route('cars.show', $car) }}">Rent Now</a>
+                                    @auth
+                                        <a class="btn-main" href="{{ route('cars.show', $car) }}">Rent Now</a>
+                                    @else
+                                        <a class="btn-main" href="{{ route('login') }}?message=rent">Rent Now</a>
+                                    @endauth
                                 @else
                                     <span class="btn btn-secondary disabled">Unavailable</span>
                                 @endif
@@ -232,7 +150,7 @@
                     <div class="col-12">
                         <div class="text-center py-5">
                             <h4>No cars found</h4>
-                            <p>Try adjusting your filters or <a href="{{ route('cars.list') }}">browse all cars</a>.</p>
+                            <p><a href="{{ route('cars.list') }}">View all cars</a> or <a href="{{ route('home') }}">return to home</a>.</p>
                         </div>
                     </div>
                     @endforelse
@@ -357,31 +275,4 @@
 </style>
 @endpush
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-submit form when filters change
-    const filterForm = document.getElementById('filter-form');
-    const checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
-    
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            filterForm.submit();
-        });
-    });
-    
-    // Price range inputs
-    const minPriceInput = document.querySelector('.input-min');
-    const maxPriceInput = document.querySelector('.input-max');
-    
-    if (minPriceInput && maxPriceInput) {
-        [minPriceInput, maxPriceInput].forEach(input => {
-            input.addEventListener('change', function() {
-                setTimeout(() => filterForm.submit(), 500);
-            });
-        });
-    }
-});
-</script>
-@endpush
 @endsection

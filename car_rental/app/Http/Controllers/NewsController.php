@@ -3,44 +3,59 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use App\Services\NewsApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
+    protected $newsApiService;
+
+    public function __construct(NewsApiService $newsApiService)
+    {
+        $this->newsApiService = $newsApiService;
+    }
     /**
      * Display a listing of published news articles.
      */
     public function index(Request $request)
     {
-        $query = News::published()->with('author');
-
-        // Handle search
-        if ($request->filled('search')) {
-            $query->search($request->search);
-        }
-
-        // Handle category filter
-        if ($request->filled('category')) {
-            $query->category($request->category);
-        }
-
-        // Handle sorting
-        $sortBy = $request->get('sort', 'published_at');
-        $sortOrder = $request->get('order', 'desc');
+        // Get page number (default to 1)
+        $page = $request->get('page', 1);
         
-        if (in_array($sortBy, ['published_at', 'views_count', 'likes_count', 'title'])) {
-            $query->orderBy($sortBy, $sortOrder);
-        } else {
-            $query->orderBy('published_at', 'desc');
+        // Fetch news from API for featured section (6 articles per page)
+        $pageSize = 6;
+        $type = $request->get('type', 'general'); // general, ev, reviews, industry
+        
+        // Fetch based on type with page parameter
+        switch ($type) {
+            case 'ev':
+                $apiResponse = $this->newsApiService->fetchElectricVehicleNews($pageSize, $page);
+                break;
+            case 'reviews':
+                $apiResponse = $this->newsApiService->fetchCarReviews($pageSize, $page);
+                break;
+            case 'industry':
+                $apiResponse = $this->newsApiService->fetchIndustryNews($pageSize, $page);
+                break;
+            default:
+                $apiResponse = $this->newsApiService->fetchCarNews($pageSize, $page);
         }
-
-        $news = $query->paginate(12);
-        $featuredNews = News::published()->featured()->limit(3)->get();
+        
+        $articles = collect($apiResponse['articles'] ?? []);
+        
+        // Transform articles for display
+        $transformedArticles = $articles->map(function($article) {
+            return (object) $this->newsApiService->transformArticle($article);
+        });
+        
+        // All articles are featured for the main page
+        $featuredNews = $transformedArticles;
+        
         $categories = News::CATEGORIES;
 
-        return view('news.index', compact('news', 'featuredNews', 'categories'));
+        return view('news.index', compact('featuredNews', 'categories', 'apiResponse', 'type', 'page'));
     }
 
     /**
@@ -175,7 +190,7 @@ class NewsController extends Controller
             'category' => 'required|string|in:' . implode(',', array_keys(News::CATEGORIES)),
             'tags' => 'nullable|array',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_published' => 'boolean',
+            'status' => 'nullable|string|in:draft,published,archived',
             'is_featured' => 'boolean',
             'published_at' => 'nullable|date',
         ]);
@@ -183,6 +198,11 @@ class NewsController extends Controller
         // Generate slug
         $validated['slug'] = News::generateSlug($validated['title']);
         $validated['author_id'] = Auth::id();
+        
+        // Set default status if not provided
+        if (!isset($validated['status'])) {
+            $validated['status'] = 'draft';
+        }
 
         // Handle featured image upload
         if ($request->hasFile('featured_image')) {
@@ -191,7 +211,7 @@ class NewsController extends Controller
         }
 
         // Set published_at if publishing now
-        if ($validated['is_published'] && !$validated['published_at']) {
+        if ($validated['status'] === 'published' && !isset($validated['published_at'])) {
             $validated['published_at'] = now();
         }
 
@@ -227,7 +247,7 @@ class NewsController extends Controller
             'category' => 'required|string|in:' . implode(',', array_keys(News::CATEGORIES)),
             'tags' => 'nullable|array',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_published' => 'boolean',
+            'status' => 'nullable|string|in:draft,published,archived',
             'is_featured' => 'boolean',
             'published_at' => 'nullable|date',
         ]);
@@ -249,7 +269,7 @@ class NewsController extends Controller
         }
 
         // Set published_at if publishing now
-        if ($validated['is_published'] && !$article->published_at && !$validated['published_at']) {
+        if (isset($validated['status']) && $validated['status'] === 'published' && !$article->published_at && !isset($validated['published_at'])) {
             $validated['published_at'] = now();
         }
 
@@ -441,5 +461,111 @@ class NewsController extends Controller
             'guides' => 'Guides',
             'events' => 'Events'
         ];
+    }
+
+    /**
+     * Fetch and display external car news from News API
+     */
+    public function externalNews(Request $request)
+    {
+        $pageSize = $request->get('pageSize', 20);
+        $type = $request->get('type', 'general'); // general, ev, reviews, industry
+        
+        // Fetch based on type
+        switch ($type) {
+            case 'ev':
+                $apiResponse = $this->newsApiService->fetchElectricVehicleNews($pageSize);
+                break;
+            case 'reviews':
+                $apiResponse = $this->newsApiService->fetchCarReviews($pageSize);
+                break;
+            case 'industry':
+                $apiResponse = $this->newsApiService->fetchIndustryNews($pageSize);
+                break;
+            default:
+                $apiResponse = $this->newsApiService->fetchCarNews($pageSize);
+        }
+        
+        $articles = collect($apiResponse['articles'] ?? []);
+        
+        // Transform articles for display
+        $transformedArticles = $articles->map(function($article) {
+            return (object) $this->newsApiService->transformArticle($article);
+        });
+        
+        $categories = $this->getCategories();
+        
+        return view('news.external', compact('transformedArticles', 'categories', 'apiResponse', 'type'));
+    }
+
+    /**
+     * Display specific external news article
+     */
+    public function showExternal(Request $request)
+    {
+        $url = $request->get('url');
+        
+        if (!$url) {
+            abort(404);
+        }
+        
+        // Redirect to the external article
+        return redirect()->away($url);
+    }
+
+    /**
+     * Import articles from News API to database
+     */
+    public function importFromApi(Request $request)
+    {
+        $this->authorize('create', News::class);
+        
+        $pageSize = $request->get('count', 10);
+        $category = $request->get('category', 'industry_news');
+        
+        $apiResponse = $this->newsApiService->fetchCarNews($pageSize);
+        $articles = $apiResponse['articles'] ?? [];
+        
+        $imported = 0;
+        $skipped = 0;
+        
+        foreach ($articles as $article) {
+            // Check if article already exists by title
+            $exists = News::where('title', $article['title'])->exists();
+            
+            if ($exists) {
+                $skipped++;
+                continue;
+            }
+            
+            try {
+                $transformed = $this->newsApiService->transformArticle($article, $category);
+                
+                // Download and save featured image if available
+                if (isset($transformed['featured_image_url'])) {
+                    try {
+                        $imageContent = file_get_contents($transformed['featured_image_url']);
+                        $imageName = 'news_' . time() . '_' . $imported . '.jpg';
+                        Storage::disk('public')->put('news/' . $imageName, $imageContent);
+                        $transformed['featured_image'] = $imageName;
+                    } catch (\Exception $e) {
+                        // If image download fails, continue without image
+                    }
+                    unset($transformed['featured_image_url']);
+                }
+                
+                unset($transformed['external_source']);
+                unset($transformed['external_url']);
+                
+                News::create($transformed);
+                $imported++;
+            } catch (\Exception $e) {
+                Log::error('Failed to import article: ' . $e->getMessage());
+                $skipped++;
+            }
+        }
+        
+        return redirect()->route('news.index')
+                        ->with('success', "Imported {$imported} articles. Skipped {$skipped} duplicates.");
     }
 }

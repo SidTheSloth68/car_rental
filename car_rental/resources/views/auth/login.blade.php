@@ -17,6 +17,13 @@
                                     <h4>Login</h4>
                                     <div class="spacer-10"></div>
                                     
+                                    <!-- Rental Message -->
+                                    @if (request('message') === 'rent')
+                                        <div class="alert alert-info mb-4" role="alert" style="background-color: #d7f2fb; border: 1px solid #c4ecfa; color: #22738e; padding: 12px 20px; border-radius: 5px;">
+                                            <i class="fa fa-info-circle"></i> <strong>You have to be signed in for renting a car</strong>
+                                        </div>
+                                    @endif
+                                    
                                     <!-- Session Status -->
                                     @if (session('status'))
                                         <div class="alert alert-success mb-4">
@@ -88,7 +95,7 @@
                                     
                                     <div class="text-center">
                                         <span>Don't have an account? </span>
-                                        <a href="{{ route('register') }}" class="text-decoration-none color-2">
+                                        <a href="{{ route('register') }}{{ request('message') ? '?message=' . request('message') : '' }}" class="text-decoration-none color-2">
                                             Register here
                                         </a>
                                     </div>

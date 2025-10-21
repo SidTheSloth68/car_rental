@@ -45,8 +45,8 @@ class CarFactory extends Factory
         $make = $this->faker->randomElement(array_keys($makes));
         $model = $this->faker->randomElement($makes[$make]);
 
-        $carTypes = ['sedan', 'suv', 'hatchback', 'coupe', 'convertible', 'wagon', 'pickup', 'minivan'];
-        $fuelTypes = ['petrol', 'diesel', 'hybrid', 'electric', 'plug-in-hybrid'];
+        $carTypes = ['economy', 'compact', 'standard', 'intermediate', 'full_size', 'premium', 'luxury', 'suv', 'minivan', 'convertible', 'sports_car', 'truck', 'van'];
+        $fuelTypes = ['petrol', 'diesel', 'hybrid', 'electric', 'lpg'];
         $transmissions = ['automatic', 'manual', 'cvt'];
         $colors = ['black', 'white', 'silver', 'gray', 'red', 'blue', 'green', 'yellow', 'brown', 'orange'];
         $locations = ['downtown', 'airport', 'city_center', 'suburban', 'north_branch', 'south_branch'];
@@ -57,15 +57,21 @@ class CarFactory extends Factory
         $doors = $seats <= 2 ? 2 : ($seats <= 5 ? 4 : 4);
 
         // Calculate base price based on car type and year
-        $basePrice = match($this->faker->randomElement($carTypes)) {
-            'sedan' => $this->faker->numberBetween(45, 85),
+        $carType = $this->faker->randomElement($carTypes);
+        $basePrice = match($carType) {
+            'economy' => $this->faker->numberBetween(35, 55),
+            'compact' => $this->faker->numberBetween(45, 65),
+            'standard' => $this->faker->numberBetween(55, 75),
+            'intermediate' => $this->faker->numberBetween(65, 85),
+            'full_size' => $this->faker->numberBetween(75, 95),
+            'premium' => $this->faker->numberBetween(95, 130),
+            'luxury' => $this->faker->numberBetween(150, 250),
             'suv' => $this->faker->numberBetween(65, 140),
-            'hatchback' => $this->faker->numberBetween(35, 65),
-            'coupe' => $this->faker->numberBetween(75, 150),
-            'convertible' => $this->faker->numberBetween(95, 200),
-            'wagon' => $this->faker->numberBetween(55, 95),
-            'pickup' => $this->faker->numberBetween(85, 160),
             'minivan' => $this->faker->numberBetween(75, 125),
+            'convertible' => $this->faker->numberBetween(95, 200),
+            'sports_car' => $this->faker->numberBetween(120, 300),
+            'truck' => $this->faker->numberBetween(85, 160),
+            'van' => $this->faker->numberBetween(65, 110),
             default => $this->faker->numberBetween(50, 100)
         };
 
@@ -79,7 +85,7 @@ class CarFactory extends Factory
             $basePrice *= 1.2;
         }
 
-        $engineSizes = ['1.0L', '1.2L', '1.4L', '1.5L', '1.6L', '2.0L', '2.4L', '2.5L', '3.0L', '3.5L', '4.0L', '5.0L', 'Electric'];
+        $engineSizes = ['1.0', '1.2', '1.4', '1.5', '1.6', '2.0', '2.4', '2.5', '3.0', '3.5', '4.0', '5.0'];
         $horsepower = $this->faker->numberBetween(120, 500);
 
         // Generate features array
@@ -129,7 +135,7 @@ class CarFactory extends Factory
             'make' => $make,
             'model' => $model,
             'year' => $year,
-            'type' => $this->faker->randomElement($carTypes),
+            'type' => $carType,
             'fuel_type' => $this->faker->randomElement($fuelTypes),
             'transmission' => $this->faker->randomElement($transmissions),
             'seats' => $seats,
@@ -145,21 +151,15 @@ class CarFactory extends Factory
             'features' => $features,
             'description' => $this->generateCarDescription($make, $model, $year, $features),
             'image' => $images[0] ?? 'cars/default.jpg',
-            'images' => json_encode($images),
+            'gallery' => $images,
             'is_available' => $this->faker->boolean(85), // 85% chance of being available
             'is_featured' => $this->faker->boolean(20), // 20% chance of being featured
             'location' => $this->faker->randomElement($locations),
-            'rating' => $this->faker->randomFloat(1, 3.5, 5.0),
-            'reviews_count' => $this->faker->numberBetween(0, 150),
-            'likes_count' => $this->faker->numberBetween(0, 200),
-            'average_rating' => $this->faker->randomFloat(1, 3.0, 5.0),
             'total_bookings' => $this->faker->numberBetween(0, 500),
+            'average_rating' => $this->faker->randomFloat(1, 3.0, 5.0),
+            'likes_count' => $this->faker->numberBetween(0, 200),
             'license_plate' => $this->generateLicensePlate(),
             'vin' => $this->generateVIN($make),
-            'insurance_policy' => 'POL-' . strtoupper(substr($make, 0, 3)) . '-' . $this->faker->randomNumber(6),
-            'maintenance_date' => $this->faker->dateTimeBetween('-3 months', '+2 months'),
-            'last_service_date' => $this->faker->dateTimeBetween('-6 months', 'now'),
-            'next_service_date' => $this->faker->dateTimeBetween('now', '+3 months'),
             'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
@@ -285,7 +285,7 @@ class CarFactory extends Factory
             return [
                 'make' => $make,
                 'model' => $this->faker->randomElement($luxuryModels[$make]),
-                'type' => $this->faker->randomElement(['sedan', 'suv', 'coupe']),
+                'type' => $this->faker->randomElement(['luxury', 'premium', 'suv']),
                 'daily_rate' => $this->faker->numberBetween(150, 350),
                 'weekly_rate' => $this->faker->numberBetween(900, 2100),
                 'monthly_rate' => $this->faker->numberBetween(3600, 8400),
@@ -326,7 +326,7 @@ class CarFactory extends Factory
             return [
                 'make' => $make,
                 'model' => $this->faker->randomElement($economyModels[$make]),
-                'type' => $this->faker->randomElement(['sedan', 'hatchback']),
+                'type' => $this->faker->randomElement(['economy', 'compact', 'standard']),
                 'daily_rate' => $this->faker->numberBetween(35, 65),
                 'weekly_rate' => $this->faker->numberBetween(210, 390),
                 'monthly_rate' => $this->faker->numberBetween(840, 1560),
@@ -363,8 +363,8 @@ class CarFactory extends Factory
                 'make' => $make,
                 'model' => $this->faker->randomElement($electricModels[$make]),
                 'fuel_type' => 'electric',
-                'transmission' => 'single-speed',
-                'engine_size' => 'Electric',
+                'transmission' => 'automatic',
+                'engine_size' => null,
                 'daily_rate' => $this->faker->numberBetween(75, 200),
                 'weekly_rate' => $this->faker->numberBetween(450, 1200),
                 'monthly_rate' => $this->faker->numberBetween(1800, 4800),

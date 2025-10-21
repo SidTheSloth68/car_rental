@@ -26,15 +26,55 @@
                 <div class="spacer-single sm-hide"></div>
                 <div class="p-4 rounded-3 shadow-soft" data-bgcolor="#ffffff">
 
+                    <!-- Display validation errors -->
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <h6><i class="fa fa-exclamation-triangle"></i> Please fix the following errors:</h6>
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <!-- Display success message -->
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            <i class="fa fa-check-circle"></i> {{ session('success') }}
+                        </div>
+                    @endif
+
+                    <!-- Display error message -->
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle"></i> {{ session('error') }}
+                        </div>
+                    @endif
+
                     <form name="bookingForm" id='booking_form' method="post" action="{{ route('bookings.store') }}">
                         @csrf
+                        
+                        @if(isset($car) && $car)
+                            <!-- Hidden field for specific car booking -->
+                            <input type="hidden" name="car_id" value="{{ $car->id }}">
+                            <input type="hidden" name="car_type" value="{{ $car->type }}">
+                            
+                            <!-- Show selected car info -->
+                            <div class="alert alert-info mb-4">
+                                <h6><i class="fa fa-car"></i> Selected Vehicle</h6>
+                                <strong>{{ $car->make }} {{ $car->model }} ({{ $car->year }})</strong>
+                                <span class="text-muted">- ৳{{ number_format($car->daily_rate * 110, 0) }}/day</span>
+                            </div>
+                        @endif
                         <div id="step-1" class="row">
+                            @if(!isset($car) || !$car)
                             <div class="col-lg-6 mb30">
                                 <h5>What is your vehicle type?</h5>
 
                                 <div class="de_form de_radio row g-3">
                                     <div class="radio-img col-lg-3 col-sm-3 col-6">
-                                        <input id="radio-1a" name="car_type" type="radio" value="economy" {{ old('car_type') == 'economy' ? 'checked' : 'checked' }}>
+                                        <input id="radio-1a" name="car_type" type="radio" value="economy" {{ old('car_type', 'economy') == 'economy' ? 'checked' : '' }}>
                                         <label for="radio-1a"><img src="{{ asset('images/select-form/car.png') }}" alt="">Car</label>
                                     </div>
 
@@ -56,9 +96,25 @@
                                 @error('car_type')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
+                                
+                                <!-- Optional: Select specific car -->
+                                @if($cars->count() > 0)
+                                <div class="mt-4">
+                                    <h6>Or select a specific car (optional):</h6>
+                                    <select name="car_id" class="form-control" id="specific_car_select">
+                                        <option value="">Let us choose the best available car</option>
+                                        @foreach($cars as $availableCar)
+                                            <option value="{{ $availableCar->id }}" {{ old('car_id') == $availableCar->id ? 'selected' : '' }}>
+                                                {{ $availableCar->make }} {{ $availableCar->model }} ({{ $availableCar->year }}) - ৳{{ number_format($availableCar->daily_rate * 110, 0) }}/day
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @endif
                             </div>
+                            @endif
 
-                            <div class="col-lg-6">
+                            <div class="{{ isset($car) && $car ? 'col-lg-12' : 'col-lg-6' }}">
                                 <div class="row">
                                     <div class="col-lg-6 mb20">
                                         <h5>Pick Up Location</h5>
@@ -175,7 +231,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="insurance" id="insurance" value="1" {{ old('insurance') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="insurance">
-                                                Additional Insurance (+$15/day)
+                                                Additional Insurance (+৳1,650/day)
                                             </label>
                                         </div>
                                     </div>
@@ -183,7 +239,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="gps" id="gps" value="1" {{ old('gps') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="gps">
-                                                GPS Navigation (+$5/day)
+                                                GPS Navigation (+৳550/day)
                                             </label>
                                         </div>
                                     </div>
@@ -191,7 +247,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="child_seat" id="child_seat" value="1" {{ old('child_seat') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="child_seat">
-                                                Child Seat (+$8/day)
+                                                Child Seat (+৳880/day)
                                             </label>
                                         </div>
                                     </div>
@@ -246,7 +302,9 @@
                                               rows="4" 
                                               placeholder="Any special requests or notes...">{{ old('notes') }}</textarea>
                                 </div>
+                            @endauth
 
+                            @auth
                                 <div class="col-lg-12">
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" type="checkbox" name="terms" id="terms" required>
@@ -254,7 +312,7 @@
                                             I agree to the <a href="#" class="text-primary">Terms and Conditions</a> and <a href="#" class="text-primary">Privacy Policy</a>
                                         </label>
                                     </div>
-                                    <button type="submit" class="btn-main pull-right">
+                                    <button type="submit" class="btn-main pull-right" id="submit-booking-btn">
                                         <i class="fa fa-calendar-check-o"></i> Book Now
                                     </button>
                                 </div>
@@ -347,14 +405,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form validation
     document.getElementById('booking_form').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submit-booking-btn');
         const pickupDate = document.getElementById('pickup_date').value;
         const returnDate = document.getElementById('return_date').value;
+        const termsAccepted = document.getElementById('terms').checked;
         
+        // Date validation
         if (pickupDate && returnDate && returnDate <= pickupDate) {
             e.preventDefault();
             alert('Return date must be after pickup date.');
             return false;
         }
+        
+        // Terms validation
+        if (!termsAccepted) {
+            e.preventDefault();
+            alert('Please accept the Terms and Conditions to continue.');
+            return false;
+        }
+        
+        // Show loading state
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
+        }
+        
+        // Re-enable button after 5 seconds in case of error
+        setTimeout(function() {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa fa-calendar-check-o"></i> Book Now';
+            }
+        }, 5000);
     });
 });
 </script>

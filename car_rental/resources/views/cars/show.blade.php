@@ -150,7 +150,7 @@
             <div class="col-lg-3">
                 <div class="de-price text-center">
                     Daily rate
-                    <h3>${{ number_format($car->price_per_day, 0) }}</h3>
+                    <h3>৳{{ number_format($car->price_per_day * 110, 0) }}</h3>
                 </div>
                 <div class="spacer-30"></div>
                 
@@ -159,6 +159,30 @@
                     <form name="bookingForm" id='booking_form' method="post" action="{{ route('bookings.store') }}">
                         @csrf
                         <input type="hidden" name="car_id" value="{{ $car->id }}">
+                        <input type="hidden" name="car_type" value="{{ $car->type }}">
+                        
+                        {{-- Display success/error messages --}}
+                        @if(session('success'))
+                            <div class="alert alert-success mb-3">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        
+                        @if(session('error'))
+                            <div class="alert alert-danger mb-3">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+                        
+                        @if($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                <ul class="mb-0">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         
                         <h4>Book this car</h4>
 
@@ -168,45 +192,84 @@
                             <div class="col-lg-12 mb20">
                                 <h5>Pick Up Location</h5>
                                 <input type="text" name="pickup_location" placeholder="Enter your pickup location" 
-                                       class="form-control" required>
+                                       class="form-control" value="{{ old('pickup_location') }}" required>
                             </div>
 
                             <div class="col-lg-12 mb20">
                                 <h5>Drop Off Location</h5>
                                 <input type="text" name="dropoff_location" placeholder="Enter your drop-off location" 
-                                       class="form-control" required>
+                                       class="form-control" value="{{ old('dropoff_location') }}" required>
                             </div>
 
                             <div class="col-lg-12 mb20">
                                 <h5>Pick Up Date & Time</h5>
-                                <input type="datetime-local" name="pickup_date" class="form-control" required>
+                                <input type="date" name="pickup_date" class="form-control" required>
+                            </div>
+
+                            <div class="col-lg-6 mb20">
+                                <h5>Pick Up Time</h5>
+                                <input type="time" name="pickup_time" class="form-control" required>
+                            </div>
+
+                            <div class="col-lg-6 mb20">
+                                <h5>Return Time</h5>
+                                <input type="time" name="return_time" class="form-control" required>
                             </div>
 
                             <div class="col-lg-12 mb20">
-                                <h5>Drop Off Date & Time</h5>
-                                <input type="datetime-local" name="dropoff_date" class="form-control" required>
+                                <h5>Return Date</h5>
+                                <input type="date" name="return_date" class="form-control" required>
                             </div>
 
                             <div class="col-lg-12 mb20">
                                 <h5>Full Name</h5>
                                 <input type="text" name="customer_name" placeholder="Enter your full name" 
-                                       class="form-control" required>
+                                       class="form-control" value="{{ old('customer_name', auth()->check() ? auth()->user()->name : '') }}" 
+                                       {{ auth()->check() ? 'readonly' : '' }} required>
+                                @if(auth()->check())
+                                    <small class="text-muted">Using your account information</small>
+                                @endif
                             </div>
 
                             <div class="col-lg-12 mb20">
                                 <h5>Email</h5>
-                                <input type="email" name="email" placeholder="Enter your email" 
-                                       class="form-control" required>
+                                <input type="email" name="customer_email" placeholder="Enter your email" 
+                                       class="form-control" value="{{ old('customer_email', auth()->check() ? auth()->user()->email : '') }}" 
+                                       {{ auth()->check() ? 'readonly' : '' }} required>
+                                @if(auth()->check())
+                                    <small class="text-muted">Using your account email</small>
+                                @endif
                             </div>
 
                             <div class="col-lg-12 mb20">
                                 <h5>Phone</h5>
-                                <input type="tel" name="phone" placeholder="Enter your phone number" 
-                                       class="form-control" required>
+                                <input type="tel" name="customer_phone" placeholder="Enter your phone number" 
+                                       class="form-control" value="{{ old('customer_phone', auth()->check() ? auth()->user()->phone : '') }}" required>
+                            </div>
+
+                            <div class="col-lg-12 mb20">
+                                <h5>Driver's License Number</h5>
+                                <input type="text" name="license_number" placeholder="Enter your driver's license number" 
+                                       class="form-control" value="{{ old('license_number', auth()->check() ? auth()->user()->license_number : '') }}" required>
+                            </div>
+
+                            <div class="col-lg-12 mb20">
+                                <h5>Special Requirements (Optional)</h5>
+                                <textarea name="notes" placeholder="Any special requirements or notes" 
+                                         class="form-control" rows="3">{{ old('notes') }}</textarea>
+                            </div>
+
+                            <div class="col-lg-12 mb20">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="terms" id="terms" value="1" required>
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" class="text-primary">Terms and Conditions</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="col-lg-12">
-                                <button type="submit" class="btn-main btn-fullwidth">Book Now</button>
+                                <button type="submit" class="btn-main btn-fullwidth" onclick="console.log('Button clicked!'); return true;">Book Now</button>
                             </div>
                         </div>
                     </form>
@@ -266,7 +329,7 @@
                                 <span class="d-atr"><img src="{{ asset('images/icons/4-green.svg') }}" alt="">{{ ucfirst($relatedCar->car_type) }}</span>
                             </div>
                             <div class="d-price">
-                                Daily rate from <span>${{ number_format($relatedCar->price_per_day, 0) }}</span>
+                                Daily rate from <span>৳{{ number_format($relatedCar->price_per_day * 110, 0) }}</span>
                                 <a class="btn-main" href="{{ route('cars.show', $relatedCar) }}">View Details</a>
                             </div>
                         </div>
@@ -295,30 +358,44 @@ document.addEventListener('DOMContentLoaded', function() {
             navText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>']
         });
     }
+
+    // Booking form validation and submission
+    const bookingForm = document.getElementById('booking_form');
+    if (bookingForm) {
+        console.log('Booking form found, attaching event listener');
+        
+        // Simple submission test - just log and allow normal submission
+        bookingForm.addEventListener('submit', function(e) {
+            console.log('Form submission triggered - allowing normal submission');
+            // Don't prevent default - let form submit normally
+        });
+    } else {
+        console.log('Booking form not found');
+    }
     
     // Calculate total price based on dates
     const pickupDateInput = document.querySelector('input[name="pickup_date"]');
-    const dropoffDateInput = document.querySelector('input[name="dropoff_date"]');
-    const dailyRate = {{ $car->price_per_day }};
+    const returnDateInput = document.querySelector('input[name="return_date"]');
+    const dailyRate = {{ $car->daily_rate ?? 100 }};
     
     function calculatePrice() {
-        if (pickupDateInput.value && dropoffDateInput.value) {
+        if (pickupDateInput.value && returnDateInput.value) {
             const pickupDate = new Date(pickupDateInput.value);
-            const dropoffDate = new Date(dropoffDateInput.value);
-            const timeDiff = dropoffDate.getTime() - pickupDate.getTime();
+            const returnDate = new Date(returnDateInput.value);
+            const timeDiff = returnDate.getTime() - pickupDate.getTime();
             const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
             
             if (daysDiff > 0) {
-                const totalPrice = dailyRate * daysDiff;
+                const totalPrice = dailyRate * daysDiff * 110; // Convert to BDT
                 // You can display the total price somewhere in the form
-                console.log('Total price for ' + daysDiff + ' days: $' + totalPrice);
+                console.log('Total price for ' + daysDiff + ' days: ৳' + totalPrice.toLocaleString());
             }
         }
     }
     
-    if (pickupDateInput && dropoffDateInput) {
+    if (pickupDateInput && returnDateInput) {
         pickupDateInput.addEventListener('change', calculatePrice);
-        dropoffDateInput.addEventListener('change', calculatePrice);
+        returnDateInput.addEventListener('change', calculatePrice);
     }
 });
 </script>

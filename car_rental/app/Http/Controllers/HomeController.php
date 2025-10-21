@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Car;
+use App\Models\News;
 
 class HomeController extends Controller
 {
@@ -35,30 +36,22 @@ class HomeController extends Controller
                 ];
             });
 
-        // Sample news data
-        $latestNews = [
-            [
-                'title' => '5 Tips for Your First Car Rental',
-                'image' => 'pic-blog-1.jpg',
-                'category' => 'Tips',
-                'date' => '25 Jan 2022',
-                'excerpt' => 'Essential tips to make your first car rental experience smooth and enjoyable.'
-            ],
-            [
-                'title' => 'Best Cars for Road Trips',
-                'image' => 'pic-blog-2.jpg',
-                'category' => 'Travel',
-                'date' => '20 Jan 2022',
-                'excerpt' => 'Discover the perfect vehicles for your next adventure on the road.'
-            ],
-            [
-                'title' => 'Electric vs Hybrid: Which to Choose?',
-                'image' => 'pic-blog-3.jpg',
-                'category' => 'Guide',
-                'date' => '15 Jan 2022',
-                'excerpt' => 'Compare electric and hybrid vehicles to make the best choice for your needs.'
-            ]
-        ];
+        // Get latest news articles from database
+        $latestNews = News::published()
+            ->orderBy('published_at', 'desc')
+            ->take(3)
+            ->get()
+            ->map(function ($news) {
+                return [
+                    'id' => $news->id,
+                    'slug' => $news->slug,
+                    'title' => $news->title,
+                    'image' => $news->featured_image ?? 'pic-blog-1.jpg',
+                    'category' => ucwords(str_replace('_', ' ', $news->category)),
+                    'date' => $news->published_at->format('d M Y'),
+                    'excerpt' => $news->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($news->content), 120)
+                ];
+            });
 
         // Sample testimonials data
         $testimonials = [

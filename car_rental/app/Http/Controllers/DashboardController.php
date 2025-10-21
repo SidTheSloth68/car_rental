@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
+use App\Models\Car;
 
 class DashboardController extends Controller
 {
@@ -17,105 +18,55 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // Get dashboard statistics
+        // Get real dashboard statistics from database
+        $userBookings = $user->bookings();
         $stats = [
-            'upcoming_orders' => 3, // This will be dynamic when booking system is implemented
-            'coupons' => 12,
-            'total_orders' => 58,
-            'cancelled_orders' => 24
+            'upcoming_orders' => $userBookings->whereIn('status', ['confirmed', 'pending'])->count(),
+            'coupons' => 0, // TODO: Implement coupons system
+            'total_orders' => $userBookings->count(),
+            'cancelled_orders' => $userBookings->where('status', 'cancelled')->count()
         ];
 
-        // Get recent orders (mock data for now)
-        $recentOrders = collect([
-            [
-                'id' => '#01236',
-                'car_name' => 'Jeep Renegade',
-                'pickup_location' => 'New York',
-                'dropoff_location' => 'Los Angeles',
-                'pickup_date' => 'March 2, 2023',
-                'return_date' => 'March 10, 2023',
-                'status' => 'completed'
-            ],
-            [
-                'id' => '#01263',
-                'car_name' => 'Mini Cooper',
-                'pickup_location' => 'San Fransisco',
-                'dropoff_location' => 'Chicago',
-                'pickup_date' => 'March 8, 2023',
-                'return_date' => 'March 10, 2023',
-                'status' => 'cancelled'
-            ],
-            [
-                'id' => '#01245',
-                'car_name' => 'Ferrari Enzo',
-                'pickup_location' => 'Philadelphia',
-                'dropoff_location' => 'Washington',
-                'pickup_date' => 'March 6, 2023',
-                'return_date' => 'March 10, 2023',
-                'status' => 'scheduled'
-            ],
-            [
-                'id' => '#01287',
-                'car_name' => 'Hyundai Staria',
-                'pickup_location' => 'Kansas City',
-                'dropoff_location' => 'Houston',
-                'pickup_date' => 'March 13, 2023',
-                'return_date' => 'March 10, 2023',
-                'status' => 'completed'
-            ],
-            [
-                'id' => '#01216',
-                'car_name' => 'Toyota Rav 4',
-                'pickup_location' => 'Baltimore',
-                'dropoff_location' => 'Sacramento',
-                'pickup_date' => 'March 7, 2023',
-                'return_date' => 'March 10, 2023',
-                'status' => 'scheduled'
-            ]
-        ]);
+        // Get recent orders from database
+        $recentBookings = $user->bookings()
+            ->with('car')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
-        // Get favorite cars (mock data for now)
-        $favoriteCars = collect([
-            [
-                'name' => 'Jeep Renegade',
-                'image' => 'images/cars/jeep-renegade.jpg',
-                'seats' => 4,
-                'luggage' => 2,
-                'doors' => 4,
-                'fuel' => 'Petrol',
-                'horsepower' => 500,
-                'engine' => 3000,
-                'drive' => '4x4',
-                'type' => 'Hatchback',
-                'daily_rate' => 265
-            ],
-            [
-                'name' => 'BMW M2',
-                'image' => 'images/cars/bmw-m5.jpg',
-                'seats' => 4,
-                'luggage' => 2,
-                'doors' => 4,
-                'fuel' => 'Petrol',
-                'horsepower' => 500,
-                'engine' => 3000,
-                'drive' => '4x4',
-                'type' => 'Hatchback',
-                'daily_rate' => 244
-            ],
-            [
-                'name' => 'Ferrari Enzo',
-                'image' => 'images/cars/ferrari-enzo.jpg',
-                'seats' => 4,
-                'luggage' => 2,
-                'doors' => 4,
-                'fuel' => 'Petrol',
-                'horsepower' => 500,
-                'engine' => 3000,
-                'drive' => '4x4',
-                'type' => 'Hatchback',
-                'daily_rate' => 167
-            ]
-        ]);
+        $recentOrders = $recentBookings->map(function($booking) {
+            return [
+                'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
+                'car_name' => $booking->car->make . ' ' . $booking->car->model,
+                'pickup_location' => $booking->pickup_location,
+                'dropoff_location' => $booking->dropoff_location,
+                'pickup_date' => $booking->pickup_date->format('F j, Y'),
+                'return_date' => $booking->return_date->format('F j, Y'),
+                'status' => $booking->status
+            ];
+        });
+
+        // Get favorite cars from available cars (top rated or most booked)
+        $favoriteCars = \App\Models\Car::where('available', true)
+            ->select('id', 'make', 'model', 'year', 'image', 'seats', 'luggage_capacity', 'doors', 'fuel_type', 'horsepower', 'engine_size', 'transmission', 'type', 'daily_rate')
+            ->orderBy('daily_rate', 'desc') // Show premium cars as favorites
+            ->take(6)
+            ->get()
+            ->map(function($car) {
+                return [
+                    'name' => $car->make . ' ' . $car->model,
+                    'image' => $car->image ?: 'images/cars/default.jpg',
+                    'seats' => $car->seats ?: 4,
+                    'luggage' => $car->luggage_capacity ?: 2,
+                    'doors' => $car->doors ?: 4,
+                    'fuel' => $car->fuel_type ?: 'Petrol',
+                    'horsepower' => $car->horsepower ?: 200,
+                    'engine' => $car->engine_size ?: 2000,
+                    'drive' => $car->transmission ?: 'Manual',
+                    'type' => $car->type ?: 'Sedan',
+                    'daily_rate' => $car->daily_rate ?: 100
+                ];
+            });
 
         return view('dashboard.index', compact('user', 'stats', 'recentOrders', 'favoriteCars'));
     }
@@ -140,98 +91,55 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // Mock booking data (will be replaced with real data when booking system is implemented)
-        $scheduledOrders = collect([
-            [
-                'id' => '#01245',
-                'car_name' => 'Ferrari Enzo',
-                'pickup_location' => 'Kentucky',
-                'dropoff_location' => 'Michigan',
-                'pickup_date' => 'March 14, 2023',
-                'return_date' => 'March 16, 2023',
-                'status' => 'scheduled'
-            ],
-            [
-                'id' => '#01246',
-                'car_name' => 'VW Polo',
-                'pickup_location' => 'Philadelphia',
-                'dropoff_location' => 'Washington',
-                'pickup_date' => 'March 16, 2023',
-                'return_date' => 'March 18, 2023',
-                'status' => 'scheduled'
-            ],
-            [
-                'id' => '#01216',
-                'car_name' => 'Toyota Rav 4',
-                'pickup_location' => 'Baltimore',
-                'dropoff_location' => 'Sacramento',
-                'pickup_date' => 'March 19, 2023',
-                'return_date' => 'March 20, 2023',
-                'status' => 'scheduled'
-            ]
-        ]);
+        // Get real booking data
+        $bookings = $user->bookings()->with('car')->orderBy('created_at', 'desc')->get();
+        
+        // If there are real bookings, use them; otherwise, fall back to mock data
+        if ($bookings->isNotEmpty()) {
+            // Group real bookings by status for the view
+            $scheduledOrders = $bookings->where('status', 'confirmed')->map(function($booking) {
+                return [
+                    'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
+                    'car_name' => $booking->car->make . ' ' . $booking->car->model,
+                    'pickup_location' => $booking->pickup_location,
+                    'dropoff_location' => $booking->dropoff_location,
+                    'pickup_date' => $booking->pickup_date,
+                    'return_date' => $booking->return_date,
+                    'status' => 'scheduled'
+                ];
+            })->values();
+            
+            $completedOrders = $bookings->where('status', 'completed')->map(function($booking) {
+                return [
+                    'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
+                    'car_name' => $booking->car->make . ' ' . $booking->car->model,
+                    'pickup_location' => $booking->pickup_location,
+                    'dropoff_location' => $booking->dropoff_location,
+                    'pickup_date' => $booking->pickup_date,
+                    'return_date' => $booking->return_date,
+                    'status' => 'completed'
+                ];
+            })->values();
+            
+            $cancelledOrders = $bookings->where('status', 'cancelled')->map(function($booking) {
+                return [
+                    'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
+                    'car_name' => $booking->car->make . ' ' . $booking->car->model,
+                    'pickup_location' => $booking->pickup_location,
+                    'dropoff_location' => $booking->dropoff_location,
+                    'pickup_date' => $booking->pickup_date,
+                    'return_date' => $booking->return_date,
+                    'status' => 'cancelled'
+                ];
+            })->values();
+        } else {
+            // Fall back to mock data if no real bookings exist
+            $scheduledOrders = collect([]);
+            $completedOrders = collect([]);
+            $cancelledOrders = collect([]);
+        }
 
-        $completedOrders = collect([
-            [
-                'id' => '#01236',
-                'car_name' => 'Jeep Renegade',
-                'pickup_location' => 'New York',
-                'dropoff_location' => 'Los Angeles',
-                'pickup_date' => 'March 2, 2023',
-                'return_date' => 'March 11, 2023',
-                'status' => 'completed'
-            ],
-            [
-                'id' => '#01287',
-                'car_name' => 'Hyundai Staria',
-                'pickup_location' => 'Nevada',
-                'dropoff_location' => 'New Mexico',
-                'pickup_date' => 'March 6, 2023',
-                'return_date' => 'March 12, 2023',
-                'status' => 'completed'
-            ],
-            [
-                'id' => '#01237',
-                'car_name' => 'Range Rover',
-                'pickup_location' => 'Virginia',
-                'dropoff_location' => 'Oregon',
-                'pickup_date' => 'March 2, 2023',
-                'return_date' => 'March 13, 2023',
-                'status' => 'completed'
-            ],
-            [
-                'id' => '#01238',
-                'car_name' => 'BMW M2',
-                'pickup_location' => 'Kansas City',
-                'dropoff_location' => 'Houston',
-                'pickup_date' => 'March 1, 2023',
-                'return_date' => 'March 14, 2023',
-                'status' => 'completed'
-            ]
-        ]);
-
-        $cancelledOrders = collect([
-            [
-                'id' => '#01263',
-                'car_name' => 'Mini Cooper',
-                'pickup_location' => 'San Francisco',
-                'dropoff_location' => 'Chicago',
-                'pickup_date' => 'March 8, 2023',
-                'return_date' => 'March 12, 2023',
-                'status' => 'cancelled'
-            ],
-            [
-                'id' => '#01264',
-                'car_name' => 'Ford Raptor',
-                'pickup_location' => 'Georgia',
-                'dropoff_location' => 'Louisiana',
-                'pickup_date' => 'March 8, 2023',
-                'return_date' => 'March 13, 2023',
-                'status' => 'cancelled'
-            ]
-        ]);
-
-        return view('dashboard.bookings', compact('user', 'scheduledOrders', 'completedOrders', 'cancelledOrders'));
+        return view('dashboard.bookings', compact('user', 'bookings', 'scheduledOrders', 'completedOrders', 'cancelledOrders'));
     }
 
     /**
@@ -243,56 +151,31 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // Mock favorite cars data (will be replaced with real data when favorites system is implemented)
-        // You can uncomment this to show sample favorite cars or leave empty to show the empty state
-        $favoriteCars = collect([
-            [
-                'id' => 1,
-                'name' => 'Jeep Renegade',
-                'image' => 'images/cars/jeep-renegade.jpg',
-                'seats' => 4,
-                'luggage' => 2,
-                'doors' => 4,
-                'fuel' => 'Petrol',
-                'horsepower' => 500,
-                'engine' => 3000,
-                'drive' => '4x4',
-                'type' => 'Hatchback',
-                'daily_rate' => 265
-            ],
-            [
-                'id' => 2,
-                'name' => 'BMW M2',
-                'image' => 'images/cars/bmw-m5.jpg',
-                'seats' => 4,
-                'luggage' => 2,
-                'doors' => 4,
-                'fuel' => 'Petrol',
-                'horsepower' => 500,
-                'engine' => 3000,
-                'drive' => '4x4',
-                'type' => 'Hatchback',
-                'daily_rate' => 244
-            ],
-            [
-                'id' => 3,
-                'name' => 'Ferrari Enzo',
-                'image' => 'images/cars/ferrari-enzo.jpg',
-                'seats' => 4,
-                'luggage' => 2,
-                'doors' => 4,
-                'fuel' => 'Petrol',
-                'horsepower' => 500,
-                'engine' => 3000,
-                'drive' => '4x4',
-                'type' => 'Hatchback',
-                'daily_rate' => 167
-            ]
-        ]);
+        // TODO: Implement user favorites system with a favorites table
+        // For now, show available premium cars as sample favorites
+        $favoriteCars = Car::where('available', true)
+            ->where('daily_rate', '>', 200) // Show premium cars as favorites
+            ->select('id', 'make', 'model', 'year', 'image', 'seats', 'luggage_capacity', 'doors', 'fuel_type', 'horsepower', 'engine_size', 'transmission', 'type', 'daily_rate')
+            ->orderBy('daily_rate', 'desc')
+            ->take(6)
+            ->get()
+            ->map(function($car) {
+                return [
+                    'id' => $car->id,
+                    'name' => $car->make . ' ' . $car->model,
+                    'image' => $car->image ?: 'images/cars/default.jpg',
+                    'seats' => $car->seats ?: 4,
+                    'luggage' => $car->luggage_capacity ?: 2,
+                    'doors' => $car->doors ?: 4,
+                    'fuel' => $car->fuel_type ?: 'Petrol',
+                    'horsepower' => $car->horsepower ?: 200,
+                    'engine' => $car->engine_size ?: 2000,
+                    'drive' => $car->transmission ?: 'Manual',
+                    'type' => $car->type ?: 'Sedan',
+                    'daily_rate' => $car->daily_rate ?: 100
+                ];
+            });
         
-        // To test the empty state, uncomment the line below:
-        // $favoriteCars = collect([]);
-
         return view('dashboard.favorites', compact('user', 'favoriteCars'));
     }
 }

@@ -3,11 +3,9 @@
     <div id="topbar" class="topbar-dark text-light">
         <div class="container">
             <div class="topbar-left xs-hide">
-                <div class="topbar-widget">
-                    <div class="topbar-widget"><a href="#"><i class="fa fa-phone"></i>+208 333 9296</a></div>
-                    <div class="topbar-widget"><a href="#"><i class="fa fa-envelope"></i>contact@caravel.com</a></div>
-                    <div class="topbar-widget"><a href="#"><i class="fa fa-clock-o"></i>Mon - Fri 08.00 - 18.00</a></div>
-                </div>
+                <div class="topbar-widget"><a href="#"><i class="fa fa-phone"></i>+208 333 9296</a></div>
+                <div class="topbar-widget"><a href="#"><i class="fa fa-envelope"></i>contact@caravel.com</a></div>
+                <div class="topbar-widget"><a href="#"><i class="fa fa-clock-o"></i>Mon - Fri 08.00 - 18.00</a></div>
             </div>
         
             <div class="topbar-right">
@@ -58,10 +56,11 @@
                         <ul id="mainmenu">
                             <li><a class="menu-item" href="{{ route('home') }}">Home</a></li>
                             <li><a class="menu-item" href="{{ route('cars.index') }}">Cars</a></li>
-                            <li><a class="menu-item" href="{{ route('cars.list') }}">Car List</a></li>
-                            <li><a class="menu-item" href="#">Booking</a></li>
-                            <li><a class="menu-item" href="#">News</a></li>
-                            <li><a class="menu-item" href="#">Contact</a></li>
+                            @auth
+                                <li><a class="menu-item" href="{{ route('bookings.index') }}">My Bookings</a></li>
+                            @endauth
+                            <li><a class="menu-item" href="{{ route('news.index') }}">News</a></li>
+                            <li><a class="menu-item" href="{{ route('contact.show') }}">Contact</a></li>
                         </ul>
                     </div>
                     <div class="de-flex-col">
@@ -74,7 +73,7 @@
                                 @endif
                                 <a href="{{ route('dashboard') }}" id="btn-book-now" class="btn-main">Dashboard</a>
                             @else
-                                <a href="{{ route('login') }}" id="btn-book-now" class="btn-main">Sign In</a>
+                                <a href="{{ route('login') }}" id="btn-login" class="btn-main">Login</a>
                             @endauth
                             <span id="menu-btn"></span>
                         </div>

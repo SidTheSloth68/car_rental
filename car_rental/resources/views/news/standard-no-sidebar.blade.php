@@ -30,7 +30,7 @@
                 <div class="de-post-type-1">
                     <div class="d-image">
                         <img alt="{{ $article->title }}" 
-                             src="{{ $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/news-2/pic-blog-1.jpg') }}" 
+                             src="{{ $article->featured_image ? asset($article->featured_image) : asset('images/news-2/pic-blog-1.jpg') }}" 
                              class="lazy">
                     </div>
                     <div class="d-content">
@@ -104,7 +104,7 @@
                     <div class="post-content">
                         <div class="post-image">
                             <img alt="{{ $featured->title }}" 
-                                 src="{{ $featured->featured_image ? asset('storage/' . $featured->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
+                                 src="{{ $featured->featured_image ? asset($featured->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
                                  class="lazy">
                         </div>
                         <div class="post-text">

@@ -1,0 +1,144 @@
+/* Booking Form Styles */
+#booking_form .radio-img {
+    display: inline-block;
+}
+
+#booking_form input[type="radio"] + label,
+#booking_form input[type="checkbox"] + label {
+    margin-right: 10px;
+}
+
+#booking_form .radio-img input[type="radio"] + label,
+#booking_form .radio-img input[type="checkbox"] + label {
+    padding: 0px;
+    position: relative;
+    background: none;
+    width: 100%;
+    float: left;
+    text-align: center;
+    margin-right: 20px;
+    background: var(--primary-color);
+    padding: 19px 20px 14px 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#booking_form .radio-img input[type="radio"]:checked + label,
+#booking_form .radio-img input[type="checkbox"]:checked + label {
+    color: #ffffff;
+    background: var(--primary-color-1);
+    transform: scale(1.05);
+}
+
+#booking_form .radio-img input[type="radio"] + label:before,
+#booking_form .radio-img input[type="checkbox"] + label:before {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    border: none;
+    display: none;
+}
+
+#booking_form .radio-img input[type="radio"] + label img,
+#booking_form .radio-img input[type="checkbox"] + label img {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+#booking_form .radio-img input[type="radio"]:checked + label img,
+#booking_form .radio-img input[type="checkbox"]:checked + label img {
+    background: var(--primary-color-1);
+}
+
+#booking_form.s2 .radio-img input[type="radio"] + label,
+#booking_form.s2 .radio-img input[type="checkbox"] + label,
+#booking_form .radio-img input[type="radio"] + label img,
+#booking_form .radio-img input[type="checkbox"] + label img {
+    width: 100%;
+    float: none;
+}
+
+/* Date Time Field Styling */
+.date-time-field {
+    display: flex;
+    gap: 10px;
+}
+
+.date-time-field input[type="date"],
+.date-time-field input[type="time"],
+.date-time-field select {
+    flex: 1;
+}
+
+/* Hide radio buttons visually but keep them accessible */
+#booking_form .radio-img input[type="radio"],
+#booking_form .radio-img input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Additional Options Checkboxes */
+#booking_form .additional-options {
+    margin-top: 20px;
+}
+
+#booking_form .additional-options .form-check {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+#booking_form .additional-options .form-check:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(var(--primary-color-rgb), 0.05);
+}
+
+#booking_form .additional-options .form-check-input:checked ~ .form-check-label {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Select Car Dropdown Styling */
+#booking_form select#car_id {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 30px;
+}
+
+/* Booking Form Submit Button */
+#submit-booking-btn {
+    min-width: 200px;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#submit-booking-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .date-time-field {
+        flex-direction: column;
+    }
+    
+    #booking_form .radio-img input[type="radio"] + label,
+    #booking_form .radio-img input[type="checkbox"] + label {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}

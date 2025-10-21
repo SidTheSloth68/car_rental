@@ -17,6 +17,14 @@ use App\Http\Controllers\Api\BookingApiController;
 */
 
 // Public API routes (no authentication required)
+// Simple, unversioned routes for backward compatibility
+Route::get('/cars', [CarApiController::class, 'index']);
+
+// Authenticated routes (simple, unversioned)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/bookings', [BookingApiController::class, 'userBookings']);
+});
+
 Route::prefix('v1')->group(function () {
     
     // Car related endpoints

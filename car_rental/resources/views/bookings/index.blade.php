@@ -11,6 +11,7 @@
             <div class="row">
                 <div class="col-md-12 text-center">
                     <h1>My Bookings</h1>
+                    <p>Welcome back, {{ auth()->user()->name }}!</p>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -19,107 +20,117 @@
 </section>
 <!-- subheader close -->
 
-<section class="pt-5 pb-5">
+<section class="no-top">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                @if(session('success'))
+                @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <i class="fa fa-check-circle"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
-                @if(session('error'))
+                @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <i class="fa fa-exclamation-triangle"></i> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>My Bookings</h2>
-                    <a href="{{ route('booking.create') }}" class="btn btn-primary">
-                        <i class="fa fa-plus"></i> New Booking
-                    </a>
-                </div>
 
                 @if($bookings->count() > 0)
-                    <div class="row">
-                        @foreach($bookings as $booking)
-                            <div class="col-lg-12 mb-4">
-                                <div class="card shadow-sm">
-                                    <div class="card-body">
-                                        <div class="row align-items-center">
-                                            <div class="col-lg-2">
-                                                @if($booking->car)
-                                                    <img src="{{ $booking->car->image_url }}" 
-                                                         alt="{{ $booking->car->full_name }}" 
-                                                         class="img-fluid rounded">
-                                                @else
-                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 100px;">
-                                                        <i class="fa fa-car fa-3x text-muted"></i>
-                                                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Booking #</th>
+                                    <th>Car</th>
+                                    <th>Pickup Date</th>
+                                    <th>Return Date</th>
+                                    <th>Days</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($bookings as $booking)
+                                    <tr>
+                                        <td><strong>{{ $booking->booking_number }}</strong></td>
+                                        <td>
+                                            {{ $booking->car->brand }} {{ $booking->car->model }}<br>
+                                            <small class="text-muted">{{ $booking->car->year }}</small>
+                                        </td>
+                                        <td>{{ $booking->pickup_date->format('M d, Y') }}</td>
+                                        <td>{{ $booking->return_date->format('M d, Y') }}</td>
+                                        <td>{{ $booking->days }}</td>
+                                        <td>৳{{ number_format($booking->final_amount * 110, 0) }}</td>
+                                        <td>
+                                            @php
+                                                $statusClass = match($booking->status) {
+                                                    'pending' => 'warning',
+                                                    'confirmed' => 'success',
+                                                    'completed' => 'info',
+                                                    'cancelled' => 'danger',
+                                                    default => 'secondary'
+                                                };
+                                            @endphp
+                                            <span class="badge bg-{{ $statusClass }}">
+                                                {{ ucfirst($booking->status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $paymentClass = match($booking->payment_status) {
+                                                    'pending' => 'warning',
+                                                    'paid' => 'success',
+                                                    'refunded' => 'info',
+                                                    'failed' => 'danger',
+                                                    default => 'secondary'
+                                                };
+                                            @endphp
+                                            <span class="badge bg-{{ $paymentClass }}">
+                                                {{ ucfirst($booking->payment_status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ route('bookings.show', $booking) }}" class="btn btn-sm btn-primary" title="View Details">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                                @if($booking->status === 'pending')
+                                                    <a href="{{ route('bookings.edit', $booking) }}" class="btn btn-sm btn-warning" title="Edit">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                @endif
+                                                @if($booking->status !== 'cancelled' && $booking->status !== 'completed')
+                                                    <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Cancel">
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    </form>
                                                 @endif
                                             </div>
-                                            <div class="col-lg-6">
-                                                <h5 class="card-title">
-                                                    {{ $booking->car ? $booking->car->full_name : 'Vehicle Not Available' }}
-                                                </h5>
-                                                <p class="card-text">
-                                                    <strong>Booking #:</strong> {{ $booking->booking_number }}<br>
-                                                    <strong>Pick-up:</strong> {{ $booking->pickup_date->format('M d, Y h:i A') }}<br>
-                                                    <strong>Return:</strong> {{ $booking->return_date->format('M d, Y h:i A') }}<br>
-                                                    <strong>Location:</strong> {{ $booking->pickup_location }}
-                                                </p>
-                                            </div>
-                                            <div class="col-lg-2 text-center">
-                                                <span class="badge bg-{{ $booking->status === 'confirmed' ? 'success' : ($booking->status === 'pending' ? 'warning' : 'danger') }} fs-6">
-                                                    {{ ucfirst($booking->status) }}
-                                                </span>
-                                                <div class="mt-2">
-                                                    <strong>${{ number_format($booking->final_amount, 2) }}</strong>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-2 text-end">
-                                                <div class="btn-group-vertical" role="group">
-                                                    <a href="{{ route('bookings.show', $booking) }}" class="btn btn-sm btn-outline-primary mb-1">
-                                                        <i class="fa fa-eye"></i> View
-                                                    </a>
-                                                    @if($booking->status === 'pending')
-                                                        <a href="{{ route('bookings.edit', $booking) }}" class="btn btn-sm btn-outline-secondary mb-1">
-                                                            <i class="fa fa-edit"></i> Edit
-                                                        </a>
-                                                        <form method="POST" action="{{ route('bookings.cancel', $booking) }}" class="d-inline">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                                    onclick="return confirm('Are you sure you want to cancel this booking?')">
-                                                                <i class="fa fa-times"></i> Cancel
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- Pagination -->
-                    <div class="d-flex justify-content-center">
+                    <div class="mt-4">
                         {{ $bookings->links() }}
                     </div>
                 @else
-                    <div class="text-center py-5">
-                        <i class="fa fa-calendar-times-o fa-5x text-muted mb-3"></i>
-                        <h3>No Bookings Found</h3>
-                        <p class="text-muted">You haven't made any bookings yet. Start by browsing our available vehicles.</p>
-                        <a href="{{ route('booking.create') }}" class="btn btn-primary me-2">
-                            <i class="fa fa-plus"></i> Make a Booking
-                        </a>
-                        <a href="{{ route('cars.index') }}" class="btn btn-outline-primary">
+                    <div class="alert alert-info text-center">
+                        <i class="fa fa-info-circle fa-3x mb-3"></i>
+                        <h4>No bookings yet</h4>
+                        <p>You haven't made any bookings. Browse our available cars and make your first booking!</p>
+                        <a href="{{ route('cars.index') }}" class="btn btn-primary mt-3">
                             <i class="fa fa-car"></i> Browse Cars
                         </a>
                     </div>

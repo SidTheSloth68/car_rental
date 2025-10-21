@@ -156,7 +156,7 @@ class AdminController extends Controller
 
         $bookings = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        return view('admin.bookings', compact('bookings'));
+        return view('admin.bookings.index', compact('bookings'));
     }
 
     /**
@@ -208,6 +208,23 @@ class AdminController extends Controller
         ];
 
         return view('admin.settings', compact('system_info'));
+    }
+
+    /**
+     * Update a booking
+     */
+    public function updateBooking(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,active,completed,cancelled'
+        ]);
+
+        $booking->update([
+            'status' => $request->status
+        ]);
+
+        return redirect()->route('admin.bookings')
+            ->with('success', 'Booking status updated successfully.');
     }
 
     /**

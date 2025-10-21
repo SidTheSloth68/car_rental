@@ -30,7 +30,7 @@
                         @foreach($recentNews as $recent)
                         <li>
                             <div class="d-image">
-                                <img src="{{ $recent->featured_image ? asset('storage/' . $recent->featured_image) : asset('images/news-thumbnail/pic-blog-1.jpg') }}" alt="{{ $recent->title }}">
+                                <img src="{{ $recent->featured_image ? asset($recent->featured_image) : asset('images/news-thumbnail/pic-blog-1.jpg') }}" alt="{{ $recent->title }}">
                             </div>
                             <div class="d-content">
                                 <a href="{{ route('news.show', $recent->slug) }}"><h4>{{ $recent->title }}</h4></a>
@@ -130,7 +130,7 @@
                 <div class="de-post-type-1">
                     <div class="d-image">
                         <img alt="{{ $article->title }}" 
-                             src="{{ $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/news-2/pic-blog-1.jpg') }}" 
+                             src="{{ $article->featured_image ? asset($article->featured_image) : asset('images/news-2/pic-blog-1.jpg') }}" 
                              class="lazy">
                     </div>
                     <div class="d-content">

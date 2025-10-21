@@ -30,7 +30,7 @@
                 <div class="blog-read">
                     @if($article->featured_image)
                     <img alt="{{ $article->title }}" 
-                         src="{{ asset('storage/' . $article->featured_image) }}" 
+                         src="{{ asset($article->featured_image) }}" 
                          class="img-fullwidth mb30">
                     @endif
 
@@ -95,7 +95,7 @@
                                 <div class="post-content">
                                     <div class="post-image">
                                         <img alt="{{ $related->title }}" 
-                                             src="{{ $related->featured_image ? asset('storage/' . $related->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
+                                             src="{{ $related->featured_image ? asset($related->featured_image) : asset('images/news/pic-blog-1.jpg') }}" 
                                              class="lazy">
                                     </div>
                                     <div class="post-text">
@@ -185,7 +185,7 @@
                         @foreach($recentArticles as $recent)
                         <li>
                             <div class="d-image">
-                                <img src="{{ $recent->featured_image ? asset('storage/' . $recent->featured_image) : asset('images/news-thumbnail/pic-blog-1.jpg') }}" alt="{{ $recent->title }}">
+                                <img src="{{ $recent->featured_image ? asset($recent->featured_image) : asset('images/news-thumbnail/pic-blog-1.jpg') }}" alt="{{ $recent->title }}">
                             </div>
                             <div class="d-content">
                                 <a href="{{ route('news.show', $recent->slug) }}"><h4>{{ $recent->title }}</h4></a>

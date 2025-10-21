@@ -31,6 +31,13 @@
                             <h3>Create Your Account</h3>
                             <p>Join Caravel and start your journey with us.</p>
                             
+                            <!-- Rental Message -->
+                            @if (request('message') === 'rent')
+                                <div class="alert alert-info mb-4" role="alert" style="background-color: #d7f2fb; border: 1px solid #c4ecfa; color: #22738e; padding: 12px 20px; border-radius: 5px;">
+                                    <i class="fa fa-info-circle"></i> <strong>You have to be signed in for renting a car.</strong> Please create an account or <a href="{{ route('login', ['message' => 'rent']) }}" style="color: #22738e; text-decoration: underline;">sign in</a>.
+                                </div>
+                            @endif
+                            
                             <form method="POST" action="{{ route('register') }}" class="form-border">
                                 @csrf
                                 
