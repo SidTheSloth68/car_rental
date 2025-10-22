@@ -319,7 +319,7 @@
                                 'upay' => 'Upay',
                                 'credit_card' => 'Credit Card',
                                 'debit_card' => 'Debit Card',
-                                'cash' => 'Cash'
+                                'cash' => 'Cash on Return'
                             ];
                         @endphp
                         {{ $paymentMethods[$booking->payment_method] ?? ucfirst(str_replace('_', ' ', $booking->payment_method)) }}

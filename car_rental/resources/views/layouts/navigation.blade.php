@@ -65,16 +65,9 @@
                     </div>
                     <div class="de-flex-col">
                         <div class="menu_side_area">
-                            @auth
-                                @if(auth()->user()->role === 'admin')
-                                    <a href="{{ route('admin.dashboard') }}" class="btn-main" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-right: 10px;" title="Admin Dashboard">
-                                        <i class="fa fa-cog"></i> Admin
-                                    </a>
-                                @endif
-                                <a href="{{ route('dashboard') }}" id="btn-book-now" class="btn-main">Dashboard</a>
-                            @else
+                            @guest
                                 <a href="{{ route('login') }}" id="btn-login" class="btn-main">Login</a>
-                            @endauth
+                            @endguest
                             <span id="menu-btn"></span>
                         </div>
                     </div>

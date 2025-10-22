@@ -364,12 +364,17 @@ class NewsApiService
      */
     public function transformArticle($article, $category = 'industry_news')
     {
+        // Format the published date
+        $publishedAt = isset($article['publishedAt']) ? date('d M Y', strtotime($article['publishedAt'])) : date('d M Y');
+        
         return [
             'title' => $article['title'] ?? 'Untitled',
             'slug' => \Illuminate\Support\Str::slug($article['title'] ?? 'untitled-' . time()),
-            'excerpt' => $article['description'] ?? '',
+            'excerpt' => \Illuminate\Support\Str::limit($article['description'] ?? '', 120),
             'content' => $this->generateContent($article),
-            'category' => $category,
+            'category' => ucwords(str_replace('_', ' ', $category)),
+            'date' => $publishedAt,
+            'image' => $article['urlToImage'] ?? asset('images/news/pic-blog-1.jpg'),
             'author_id' => 1, // Default admin user
             'published_at' => isset($article['publishedAt']) ? date('Y-m-d H:i:s', strtotime($article['publishedAt'])) : now(),
             'is_published' => true,

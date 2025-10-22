@@ -25,7 +25,9 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $bookings = Auth::user()->bookings()->with('car')->latest()->paginate(10);
+        $bookings = Auth::user()->bookings()->with(['car' => function($query) {
+            $query->withTrashed();
+        }])->latest()->paginate(10);
         
         return view('bookings.index', compact('bookings'));
     }
@@ -110,7 +112,7 @@ class BookingController extends Controller
                 $car = Car::where('is_available', true)
                     ->where('type', $validated['car_type'])
                     ->whereDoesntHave('bookings', function($query) use ($pickupDate, $returnDate) {
-                        $query->where('status', '!=', 'cancelled')
+                        $query->where('status', 'active') // Only check active bookings
                               ->where(function($q) use ($pickupDate, $returnDate) {
                                   $q->whereBetween('pickup_date', [$pickupDate, $returnDate])
                                     ->orWhereBetween('return_date', [$pickupDate, $returnDate])
@@ -129,9 +131,9 @@ class BookingController extends Controller
             } else {
                 $car = Car::findOrFail($validated['car_id']);
                 
-                // Check if car has conflicting bookings
+                // Check if car has conflicting active bookings
                 $hasConflict = $car->bookings()
-                    ->where('status', '!=', 'cancelled')
+                    ->where('status', 'active') // Only check active bookings
                     ->where(function($query) use ($pickupDate, $returnDate) {
                         $query->whereBetween('pickup_date', [$pickupDate, $returnDate])
                               ->orWhereBetween('return_date', [$pickupDate, $returnDate])
@@ -186,7 +188,8 @@ class BookingController extends Controller
             
             $finalAmount = $totalAmount + $taxAmount + $extrasAmount;
 
-            // Create booking
+            // Create booking with automatic active status
+            // Since car is available and no conflicts, automatically assign as active
             $booking = Booking::create([
                 'user_id' => Auth::id(),
                 'car_id' => $car->id,
@@ -207,13 +210,18 @@ class BookingController extends Controller
                 'customer_address' => $validated['customer_address'] ?? null,
                 'special_requirements' => $validated['notes'] ?? null,
                 'extras' => count($extras) > 0 ? $extras : null,
-                'status' => 'pending',
+                'status' => 'active', // Automatically set to active after availability check
                 'payment_status' => 'pending',
                 'payment_method' => 'pending', // User will select payment method later
             ]);
 
+            // Mark car as unavailable when booking is active
+            $car->update([
+                'is_available' => false
+            ]);
+
             return redirect()->route('bookings.show', $booking)
-                ->with('success', 'Booking created successfully! Please select your payment method to complete the booking.');
+                ->with('success', 'Booking created successfully and is now active! The car is now unavailable until the booking is completed. Please select your payment method to complete the booking.');
 
         } catch (\Exception $e) {
             Log::error('Booking creation failed: ' . $e->getMessage());
@@ -247,10 +255,10 @@ class BookingController extends Controller
             abort(403, 'Unauthorized access to booking.');
         }
         
-        // Only allow editing of pending bookings
-        if ($booking->status !== 'pending') {
+        // Only allow editing of active bookings (not done/completed ones)
+        if ($booking->status === 'done') {
             return redirect()->route('bookings.show', $booking)
-                ->with('error', 'Only pending bookings can be edited.');
+                ->with('error', 'Completed bookings cannot be edited.');
         }
         
         $cars = Car::where('availability_status', 'available')->get();
@@ -268,10 +276,10 @@ class BookingController extends Controller
             abort(403, 'Unauthorized access to booking.');
         }
         
-        // Only allow updating of pending bookings
-        if ($booking->status !== 'pending') {
+        // Only allow updating of active bookings (not done/completed ones)
+        if ($booking->status === 'done') {
             return redirect()->route('bookings.show', $booking)
-                ->with('error', 'Only pending bookings can be updated.');
+                ->with('error', 'Completed bookings cannot be updated.');
         }
 
         $validated = $request->validate([
@@ -336,17 +344,22 @@ class BookingController extends Controller
             abort(403, 'Unauthorized access to booking.');
         }
         
-        // Only allow deleting of pending bookings
-        if ($booking->status !== 'pending') {
+        // Only allow deleting of active bookings (not completed ones)
+        if ($booking->status === 'done') {
             return redirect()->route('bookings.index')
-                ->with('error', 'Only pending bookings can be deleted.');
+                ->with('error', 'Completed bookings cannot be deleted.');
         }
 
         try {
+            // Make car available again before deleting booking
+            $booking->car->update([
+                'is_available' => true
+            ]);
+            
             $booking->delete();
             
             return redirect()->route('bookings.index')
-                ->with('success', 'Booking deleted successfully!');
+                ->with('success', 'Booking deleted successfully! The car is now available again.');
                 
         } catch (\Exception $e) {
             Log::error('Booking deletion failed: ' . $e->getMessage());
@@ -356,37 +369,50 @@ class BookingController extends Controller
     }
 
     /**
-     * Cancel a booking.
+     * Mark a booking as done/completed.
      */
     public function cancel(Booking $booking)
     {
-        // Ensure user can only cancel their own bookings
+        // Ensure user can only update their own bookings
         if ($booking->user_id !== Auth::id()) {
             abort(403, 'Unauthorized access to booking.');
         }
         
-        if ($booking->status === 'cancelled' || $booking->status === 'completed') {
-            return back()->with('error', 'This booking cannot be cancelled.');
+        if ($booking->status === 'done') {
+            return back()->with('error', 'This booking is already marked as done.');
         }
 
         try {
-            $booking->update([
-                'status' => 'cancelled',
-                'cancelled_at' => now(),
-            ]);
+            // When marking as done, if payment method is cash and payment is pending, mark as paid
+            $updateData = [
+                'status' => 'done',
+                'completed_at' => now(),
+            ];
             
-            // Make car available again when booking is cancelled
+            if ($booking->payment_method === 'cash' && $booking->payment_status === 'pending') {
+                $updateData['payment_status'] = 'paid';
+                $updateData['paid_at'] = now();
+            }
+            
+            $booking->update($updateData);
+            
+            // Make car available again when booking is done
             $booking->car->update([
                 'is_available' => true
             ]);
             
+            $message = 'Booking marked as done successfully! The car is now available again.';
+            if ($booking->payment_method === 'cash') {
+                $message .= ' Cash payment has been recorded.';
+            }
+            
             return redirect()->route('bookings.show', $booking)
-                ->with('success', 'Booking cancelled successfully! The car is now available again.');
+                ->with('success', $message);
                 
         } catch (\Exception $e) {
-            Log::error('Booking cancellation failed: ' . $e->getMessage());
+            Log::error('Booking completion failed: ' . $e->getMessage());
             
-            return back()->with('error', 'Failed to cancel booking. Please try again.');
+            return back()->with('error', 'Failed to mark booking as done. Please try again.');
         }
     }
 
@@ -413,21 +439,30 @@ class BookingController extends Controller
         }
 
         try {
+            // For cash payment, keep payment status as pending until booking is done
+            if ($validated['payment_method'] === 'cash') {
+                $booking->update([
+                    'payment_status' => 'pending',
+                    'payment_method' => $validated['payment_method'],
+                ]);
+                
+                return redirect()->route('bookings.show', $booking)
+                    ->with('success', 'Payment method set to Cash on Return. Payment will be collected when you return the vehicle.');
+            }
+            
+            // For all other payment methods, mark as paid immediately
             $booking->update([
                 'payment_status' => 'paid',
                 'payment_method' => $validated['payment_method'],
                 'transaction_id' => $validated['transaction_id'] ?? null,
-                'status' => 'confirmed',
-                'confirmed_at' => now(),
+                'paid_at' => now(),
             ]);
             
-            // Mark car as unavailable when booking is confirmed
-            $booking->car->update([
-                'is_available' => false
-            ]);
+            // Car is already marked as unavailable when booking was created as active
+            // No need to update car availability here
             
             return redirect()->route('bookings.show', $booking)
-                ->with('success', 'Payment processed successfully! Your booking is now confirmed.');
+                ->with('success', 'Payment processed successfully! Your booking is active.');
                 
         } catch (\Exception $e) {
             Log::error('Payment processing failed: ' . $e->getMessage());

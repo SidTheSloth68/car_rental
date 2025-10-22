@@ -27,6 +27,9 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'language' => ['nullable', 'string', 'max:50'],
+            'hour_format' => ['nullable', 'string', 'in:12-hour,24-hour'],
         ];
     }
 }

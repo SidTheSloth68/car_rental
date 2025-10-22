@@ -26,15 +26,29 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
+        
+        // Handle password update separately
+        if (!empty($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']);
+        } else {
+            // Remove password from validated data if not provided
+            unset($validated['password']);
+        }
+        
+        // Remove password_confirmation as it's not a database field
+        unset($validated['password_confirmation']);
+        
+        $user->fill($validated);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return Redirect::route('dashboard.profile')->with('status', 'profile-updated');
+        return Redirect::route('dashboard.profile')->with('status', 'Profile updated successfully!');
     }
 
     /**

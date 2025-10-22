@@ -30,7 +30,7 @@
     />
 
     <!-- Vehicle Types Marquee -->
-    <section aria-label="section" class="pt40 pb40 text-light" data-bgcolor="#111111">
+    <section aria-label="section" class="pt40 pb40 text-light mt-5 mt-lg-0" data-bgcolor="#111111">
         <div class="wow fadeInRight d-flex">
             <div class="de-marquee-list">
                 <div class="d-item">
@@ -356,14 +356,14 @@
                         <div class="bloglist s2 item">
                             <div class="post-content">
                                 <div class="post-image">
-                                    <img alt="{{ $news['title'] }}" src="{{ asset($news['image']) }}" class="lazy">
+                                    <img alt="{{ $news['title'] }}" src="{{ $news['image'] }}" class="lazy" onerror="this.src='{{ asset('images/news/pic-blog-1.jpg') }}'">
                                 </div>
                                 <div class="post-text">
                                     <span class="p-tagline">{{ $news['category'] }}</span>
                                     <span class="p-date">{{ $news['date'] }}</span>
-                                    <h4><a href="{{ route('news.show', $news['slug']) }}">{{ $news['title'] }}</a></h4>
+                                    <h4><a href="{{ $news['external_url'] ?? '#' }}" target="_blank">{{ $news['title'] }}</a></h4>
                                     <p>{{ $news['excerpt'] }}</p>
-                                    <a class="btn-main" href="{{ route('news.show', $news['slug']) }}">Read More</a>
+                                    <a class="btn-main" href="{{ $news['external_url'] ?? '#' }}" target="_blank">Read More</a>
                                 </div>
                             </div>
                         </div>
@@ -520,31 +520,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Admin Quick Access (only visible to admins) -->
-    @auth
-        @if(auth()->user()->role === 'admin')
-        <section aria-label="admin-access" class="pt20 pb20" data-bgcolor="#f8f9fa">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="text-center">
-                            <div class="alert alert-info d-inline-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
-                                <i class="fa fa-user-shield fa-lg me-3"></i>
-                                <div>
-                                    <strong>Welcome Admin!</strong> 
-                                    <a href="{{ route('admin.dashboard') }}" class="btn btn-light btn-sm ms-3">
-                                        <i class="fa fa-cog"></i> Access Admin Dashboard
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        @endif
-    @endauth
 </div>
 
 <!-- Back to top -->

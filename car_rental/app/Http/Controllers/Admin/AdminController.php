@@ -24,18 +24,20 @@ class AdminController extends Controller
             'total_admins' => User::where('role', 'admin')->count(),
             'total_customers' => User::where('role', 'customer')->count(),
             'total_cars' => Car::count(),
-            'available_cars' => Car::where('available', true)->count(),
+            'available_cars' => Car::where('is_available', true)->count(),
             'total_bookings' => Booking::count(),
             'pending_bookings' => Booking::where('status', 'pending')->count(),
-            'confirmed_bookings' => Booking::where('status', 'confirmed')->count(),
+            'confirmed_bookings' => Booking::where('status', 'active')->count(),
             'total_news' => News::count(),
             'published_news' => News::where('status', 'published')->count(),
         ];
 
         // Recent activities
         $recent_users = User::latest()->take(5)->get();
-        $recent_bookings = Booking::with(['car', 'user'])->latest()->take(5)->get();
-        $recent_news = News::latest()->take(5)->get();
+        $recent_bookings = Booking::with(['car' => function($query) {
+            $query->withTrashed();
+        }, 'user'])->latest()->take(5)->get();
+        $recent_cars = Car::latest()->take(5)->get();
 
         // Monthly statistics
         $monthly_stats = [
@@ -111,7 +113,7 @@ class AdminController extends Controller
 
         // Filter by availability
         if ($request->has('available') && $request->available != '') {
-            $query->where('available', $request->available);
+            $query->where('is_available', $request->available);
         }
 
         // Filter by type
@@ -129,7 +131,9 @@ class AdminController extends Controller
      */
     public function bookings(Request $request)
     {
-        $query = Booking::with(['car', 'user']);
+        $query = Booking::with(['car' => function($q) {
+            $q->withTrashed();
+        }, 'user']);
 
         // Search functionality
         if ($request->has('search')) {
@@ -254,7 +258,7 @@ class AdminController extends Controller
             DB::raw("strftime('%m', created_at) as month"),
             DB::raw("strftime('%Y', created_at) as year")
         )
-        ->where('status', '!=', 'cancelled')
+        ->whereIn('status', ['active', 'done'])
         ->where('created_at', '>=', now()->subMonths(12))
         ->groupBy('year', 'month')
         ->orderBy('year', 'desc')

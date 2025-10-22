@@ -43,7 +43,6 @@
                         <ul class="menu-col">
                             <li><a href="{{ route('dashboard') }}" class="active"><i class="fa fa-home"></i>Dashboard</a></li>
                             <li><a href="{{ route('dashboard.profile') }}"><i class="fa fa-user"></i>My Profile</a></li>
-                            <li><a href="{{ route('dashboard.bookings') }}"><i class="fa fa-calendar"></i>My Orders</a></li>
                             <li><a href="{{ route('dashboard.favorites') }}"><i class="fa fa-car"></i>My Favorite Cars</a></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}" style="display: inline;">
@@ -137,41 +136,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
-
-                    <div class="card p-4 rounded-5">
-                        <h4>My Favorites</h4>
-                        <div class="spacer-10"></div>
-                        
-                        @foreach($favoriteCars as $car)
-                        <div class="de-item-list no-border mb30">
-                            <div class="d-img">
-                                <img src="{{ asset($car['image']) }}" class="img-fluid" alt="">
-                            </div>
-                            <div class="d-info">
-                                <div class="d-text">
-                                    <h4>{{ $car['name'] }}</h4>
-                                    <div class="d-atr-group">
-                                        <ul class="d-atr">
-                                            <li><span>Seats:</span>{{ $car['seats'] }}</li>
-                                            <li><span>Luggage:</span>{{ $car['luggage'] }}</li>
-                                            <li><span>Doors:</span>{{ $car['doors'] }}</li>
-                                            <li><span>Fuel:</span>{{ $car['fuel'] }}</li>
-                                            <li><span>Horsepower:</span>{{ $car['horsepower'] }}</li>
-                                            <li><span>Engine:</span>{{ $car['engine'] }}</li>
-                                            <li><span>Drive:</span>{{ $car['drive'] }}</li>
-                                            <li><span>Type:</span>{{ $car['type'] }}</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-price">
-                                Daily rate from <span>৳{{ number_format($car['daily_rate'] * 110, 0) }}</span>
-                                <a class="btn-main" href="#">Rent Now</a>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div>
-                        @endforeach
                     </div>
                 </div>
             </div>

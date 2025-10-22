@@ -143,6 +143,7 @@
                 </div>
                 <div class="card-body">
                     @forelse($recent_cars as $car)
+                        @if($car)
                         <div class="d-flex align-items-center py-2 border-bottom">
                             <div class="mr-3">
                                 <div class="icon-circle bg-success">
@@ -150,16 +151,17 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1">
-                                <div class="font-weight-bold">{{ $car->make }} {{ $car->model }}</div>
-                                <div class="text-muted small">{{ $car->year }} - {{ ucfirst($car->type) }}</div>
+                                <div class="font-weight-bold">{{ $car->make ?? 'Unknown' }} {{ $car->model ?? '' }}</div>
+                                <div class="text-muted small">{{ $car->year ?? 'N/A' }} - {{ $car->type ? ucfirst($car->type) : 'N/A' }}</div>
                                 <div class="text-muted small">
-                                    ৳{{ number_format($car->daily_rate * 110, 0) }}/day - 
-                                    <span class="badge badge-{{ $car->available ? 'success' : 'danger' }}">
-                                        {{ $car->available ? 'Available' : 'Unavailable' }}
+                                    ৳{{ $car->daily_rate ? number_format($car->daily_rate * 110, 0) : '0' }}/day - 
+                                    <span class="badge badge-{{ $car->is_available ? 'success' : 'danger' }}">
+                                        {{ $car->is_available ? 'Available' : 'Unavailable' }}
                                     </span>
                                 </div>
                             </div>
                         </div>
+                        @endif
                     @empty
                         <p class="text-muted">No cars found.</p>
                     @endforelse

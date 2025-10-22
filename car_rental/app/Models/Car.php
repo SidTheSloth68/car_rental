@@ -26,8 +26,6 @@ class Car extends Model
         'doors',
         'luggage_capacity',
         'daily_rate',
-        'weekly_rate',
-        'monthly_rate',
         'mileage',
         'color',
         'license_plate',
@@ -45,10 +43,7 @@ class Car extends Model
         'insurance_included',
         'minimum_age',
         'deposit_amount',
-        'cancellation_policy',
-        'total_bookings',
-        'average_rating',
-        'likes_count'
+        'cancellation_policy'
     ];
 
     /**
@@ -61,8 +56,6 @@ class Car extends Model
         'seats' => 'integer',
         'doors' => 'integer',
         'daily_rate' => 'decimal:2',
-        'weekly_rate' => 'decimal:2',
-        'monthly_rate' => 'decimal:2',
         'mileage' => 'integer',
         'engine_size' => 'decimal:1',
         'horsepower' => 'integer',
@@ -74,9 +67,6 @@ class Car extends Model
         'insurance_included' => 'boolean',
         'minimum_age' => 'integer',
         'deposit_amount' => 'decimal:2',
-        'total_bookings' => 'integer',
-        'average_rating' => 'decimal:2',
-        'likes_count' => 'integer',
         'deleted_at' => 'datetime'
     ];
 
@@ -235,7 +225,7 @@ class Car extends Model
 
         // Check for conflicting bookings
         $conflictingBookings = $this->bookings()
-            ->where('status', '!=', 'cancelled')
+            ->where('status', 'active')
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('pickup_date', [$startDate, $endDate])
                       ->orWhereBetween('return_date', [$startDate, $endDate])
@@ -260,9 +250,9 @@ class Car extends Model
         
         // Apply weekly/monthly discounts
         if ($days >= 30) {
-            $basePrice = $this->monthly_rate ?: ($this->daily_rate * $days * 0.8);
+            $basePrice = $this->daily_rate * $days * 0.8; // 20% discount for monthly
         } elseif ($days >= 7) {
-            $basePrice = $this->weekly_rate ?: ($this->daily_rate * $days * 0.9);
+            $basePrice = $this->daily_rate * $days * 0.9; // 10% discount for weekly
         }
 
         // Apply discount code logic (to be implemented)
@@ -317,5 +307,37 @@ class Car extends Model
     public function getCarTypeAttribute()
     {
         return $this->type;
+    }
+
+    /**
+     * Accessor for available to map to is_available (for backward compatibility)
+     */
+    public function getAvailableAttribute()
+    {
+        return $this->is_available;
+    }
+
+    /**
+     * Mutator for available to map to is_available (for backward compatibility)
+     */
+    public function setAvailableAttribute($value)
+    {
+        $this->attributes['is_available'] = $value;
+    }
+
+    /**
+     * Get users who favorited this car.
+     */
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
+    }
+
+    /**
+     * Check if car is favorited by user.
+     */
+    public function isFavoritedBy($userId): bool
+    {
+        return $this->favoritedBy()->where('user_id', $userId)->exists();
     }
 }

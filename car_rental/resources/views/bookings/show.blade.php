@@ -48,10 +48,8 @@
                         <div class="mb-4 text-center">
                             @php
                                 $statusClass = match($booking->status) {
-                                    'pending' => 'warning',
-                                    'confirmed' => 'success',
-                                    'completed' => 'info',
-                                    'cancelled' => 'danger',
+                                    'active' => 'success',
+                                    'done' => 'info',
                                     default => 'secondary'
                                 };
                                 $paymentClass = match($booking->payment_status) {
@@ -61,12 +59,22 @@
                                     'failed' => 'danger',
                                     default => 'secondary'
                                 };
+                                
+                                // Display text for status
+                                $statusText = $booking->status === 'active' ? 'Active' : 'Done';
+                                
+                                // Display text for payment
+                                if ($booking->payment_status === 'pending' && $booking->payment_method === 'cash' && $booking->status === 'active') {
+                                    $paymentText = 'Pay on Return';
+                                } else {
+                                    $paymentText = ucfirst($booking->payment_status);
+                                }
                             @endphp
                             <span class="badge bg-{{ $statusClass }} fs-5 me-2">
-                                Status: {{ ucfirst($booking->status) }}
+                                Status: {{ $statusText }}
                             </span>
                             <span class="badge bg-{{ $paymentClass }} fs-5">
-                                Payment: {{ ucfirst($booking->payment_status) }}
+                                Payment: {{ $paymentText }}
                             </span>
                         </div>
 
@@ -207,7 +215,7 @@
                                 'upay' => 'Upay',
                                 'credit_card' => 'Credit Card',
                                 'debit_card' => 'Debit Card',
-                                'cash' => 'Cash',
+                                'cash' => 'Cash on Return',
                                 'pending' => 'Not Selected Yet'
                             ];
                         @endphp
@@ -231,7 +239,11 @@
                                     @if($booking->payment_status === 'paid')
                                         <span class="badge bg-success fs-6">Paid</span>
                                     @elseif($booking->payment_status === 'pending')
-                                        <span class="badge bg-warning text-dark fs-6">Pending</span>
+                                        @if($booking->payment_method === 'cash' && $booking->status === 'active')
+                                            <span class="badge bg-warning text-dark fs-6">Pending (Pay on Return)</span>
+                                        @else
+                                            <span class="badge bg-warning text-dark fs-6">Pending</span>
+                                        @endif
                                     @elseif($booking->payment_status === 'failed')
                                         <span class="badge bg-danger fs-6">Failed</span>
                                     @else
@@ -247,8 +259,15 @@
                             </div>
                         @endif
 
-                        <!-- Payment Section (if payment is pending) -->
-                        @if($booking->payment_status === 'pending' && $booking->status !== 'cancelled')
+                        <!-- Info for cash on return payment -->
+                        @if($booking->payment_method === 'cash' && $booking->payment_status === 'pending' && $booking->status === 'active')
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i> <strong>Cash on Return:</strong> You have selected to pay in cash when returning the vehicle. Payment will be collected when the booking is marked as done.
+                            </div>
+                        @endif
+
+                        <!-- Payment Section (if payment is pending and not cash on return) -->
+                        @if($booking->payment_status === 'pending' && $booking->payment_method !== 'cash')
                             <div class="alert alert-warning">
                                 <i class="fa fa-exclamation-triangle"></i> <strong>Payment Required:</strong> Please complete your payment to confirm this booking.
                             </div>
@@ -292,7 +311,7 @@
                                                 
                                                 <optgroup label="Other Methods">
                                                     <option value="cash" {{ $booking->payment_method === 'cash' ? 'selected' : '' }}>
-                                                        💵 Cash on Pickup
+                                                        💵 Cash on Return
                                                     </option>
                                                 </optgroup>
                                             </select>
@@ -333,9 +352,9 @@
                                             <!-- Cash Payment Instructions -->
                                             <div id="cashInstructions" class="payment-instruction" style="display: none;">
                                                 <div class="alert alert-success">
-                                                    <h6><i class="fa fa-money"></i> Cash Payment:</h6>
-                                                    <p>You can pay cash when picking up the vehicle. Please bring the exact amount of <strong>৳{{ number_format($booking->final_amount * 110, 0) }}</strong></p>
-                                                    <p class="mb-0"><small><i class="fa fa-info-circle"></i> Booking reference: {{ $booking->booking_number }}</small></p>
+                                                    <h6><i class="fa fa-money"></i> Cash on Return:</h6>
+                                                    <p>You will pay cash when returning the vehicle. Please bring the amount of <strong>৳{{ number_format($booking->final_amount * 110, 0) }}</strong></p>
+                                                    <p class="mb-0"><small><i class="fa fa-info-circle"></i> Payment will be collected when the booking is marked as done. Booking reference: {{ $booking->booking_number }}</small></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -401,7 +420,7 @@
                                 <i class="fa fa-arrow-left"></i> Back to Bookings
                             </a>
                             
-                            @if($booking->status === 'pending')
+                            @if($booking->status === 'active')
                                 <a href="{{ route('bookings.edit', $booking) }}" class="btn btn-warning">
                                     <i class="fa fa-edit"></i> Edit Booking
                                 </a>
@@ -413,12 +432,12 @@
                                 </a>
                             @endif
 
-                            @if($booking->status !== 'cancelled' && $booking->status !== 'completed')
-                                <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                            @if($booking->status === 'active')
+                                <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to mark this booking as complete? This will finalize the service and process any pending payments.');">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fa fa-times"></i> Cancel Booking
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-check"></i> Complete Service
                                     </button>
                                 </form>
                             @endif

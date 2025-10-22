@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Car;
 use App\Models\News;
+use App\Services\NewsApiService;
 
 class HomeController extends Controller
 {
+    protected $newsApiService;
+
+    public function __construct(NewsApiService $newsApiService)
+    {
+        $this->newsApiService = $newsApiService;
+    }
+
     /**
      * Display the homepage.
      *
@@ -18,8 +26,10 @@ class HomeController extends Controller
         // Get featured cars from database
         $featuredCars = Car::featured()
             ->available()
+            ->distinct()
             ->take(6)
             ->get()
+            ->unique('id')
             ->map(function ($car) {
                 return [
                     'id' => $car->id,
@@ -32,26 +42,28 @@ class HomeController extends Controller
                     'doors' => $car->doors,
                     'fuel' => ucfirst($car->fuel_type),
                     'type' => ucwords(str_replace('_', ' ', $car->type)),
-                    'rating' => $car->average_rating
+                    'rating' => $car->average_rating,
+                    'is_available' => $car->is_available
                 ];
             });
 
-        // Get latest news articles from database
-        $latestNews = News::published()
-            ->orderBy('published_at', 'desc')
-            ->take(3)
-            ->get()
-            ->map(function ($news) {
-                return [
-                    'id' => $news->id,
-                    'slug' => $news->slug,
-                    'title' => $news->title,
-                    'image' => $news->featured_image ?? 'pic-blog-1.jpg',
-                    'category' => ucwords(str_replace('_', ' ', $news->category)),
-                    'date' => $news->published_at->format('d M Y'),
-                    'excerpt' => $news->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($news->content), 120)
-                ];
-            });
+        // Fetch latest news from NewsAPI (3 articles)
+        $apiResponse = $this->newsApiService->fetchCarNews(3, 1);
+        $articles = collect($apiResponse['articles'] ?? []);
+        
+        // Transform articles for display
+        $latestNews = $articles->take(3)->map(function($article) {
+            $transformed = $this->newsApiService->transformArticle($article);
+            return [
+                'title' => $transformed['title'],
+                'slug' => $transformed['slug'],
+                'image' => $transformed['image'],
+                'category' => $transformed['category'],
+                'date' => $transformed['date'],
+                'excerpt' => $transformed['excerpt'],
+                'external_url' => $transformed['external_url']
+            ];
+        });
 
         // Sample testimonials data
         $testimonials = [

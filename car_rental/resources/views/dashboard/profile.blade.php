@@ -43,7 +43,6 @@
                         <ul class="menu-col">
                             <li><a href="{{ route('dashboard') }}"><i class="fa fa-home"></i>Dashboard</a></li>
                             <li><a href="{{ route('dashboard.profile') }}" class="active"><i class="fa fa-user"></i>My Profile</a></li>
-                            <li><a href="{{ route('dashboard.bookings') }}"><i class="fa fa-calendar"></i>My Orders</a></li>
                             <li><a href="{{ route('dashboard.favorites') }}"><i class="fa fa-car"></i>My Favorite Cars</a></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}" style="display: inline;">
@@ -116,27 +115,21 @@
                                                     <div class="col-md-6 mb20">
                                                         <h5>Language</h5>
                                                         <p class="p-info">Select your preferred language.</p>
-                                                        <div id="select_lang" class="dropdown fullwidth">
-                                                            <a href="#" class="btn-selector">English</a>
-                                                            <ul>
-                                                                <li class="active"><span>English</span></li>
-                                                                <li><span>French</span></li>
-                                                                <li><span>German</span></li>
-                                                                <li><span>Japanese</span></li>
-                                                                <li><span>Italian</span></li>
-                                                            </ul>
-                                                        </div>
+                                                        <select name="language" class="form-control">
+                                                            <option value="English" {{ old('language', $user->language ?? 'English') == 'English' ? 'selected' : '' }}>English</option>
+                                                            <option value="French" {{ old('language', $user->language) == 'French' ? 'selected' : '' }}>French</option>
+                                                            <option value="German" {{ old('language', $user->language) == 'German' ? 'selected' : '' }}>German</option>
+                                                            <option value="Japanese" {{ old('language', $user->language) == 'Japanese' ? 'selected' : '' }}>Japanese</option>
+                                                            <option value="Italian" {{ old('language', $user->language) == 'Italian' ? 'selected' : '' }}>Italian</option>
+                                                        </select>
                                                     </div>
                                                     <div class="col-md-6 mb20">
                                                         <h5>Hour Format</h5>
                                                         <p class="p-info">Select your preferred time format.</p>
-                                                        <div id="select_hour_format" class="dropdown fullwidth">
-                                                            <a href="#" class="btn-selector">24-hour</a>
-                                                            <ul>
-                                                                <li class="active"><span>24-hour</span></li>
-                                                                <li><span>12-hour</span></li>
-                                                            </ul>
-                                                        </div>
+                                                        <select name="hour_format" class="form-control">
+                                                            <option value="24-hour" {{ old('hour_format', $user->hour_format ?? '24-hour') == '24-hour' ? 'selected' : '' }}>24-hour</option>
+                                                            <option value="12-hour" {{ old('hour_format', $user->hour_format) == '12-hour' ? 'selected' : '' }}>12-hour</option>
+                                                        </select>
                                                     </div>                               
                                                 </div>
                                             </div>

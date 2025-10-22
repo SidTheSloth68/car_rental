@@ -43,7 +43,18 @@
             </div>
 
             <div class="col-lg-3">
-                <h3>{{ $car->make }} {{ $car->model }} {{ $car->year }}</h3>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">{{ $car->make }} {{ $car->model }} {{ $car->year }}</h3>
+                    @auth
+                        <button class="favorite-btn-detail btn btn-sm border-0 bg-transparent" 
+                                data-car-id="{{ $car->id }}"
+                                data-favorited="{{ auth()->user()->hasFavorited($car->id) ? 'true' : 'false' }}"
+                                style="cursor: pointer; font-size: 24px;"
+                                title="{{ auth()->user()->hasFavorited($car->id) ? 'Remove from favorites' : 'Add to favorites' }}">
+                            <i class="fa fa-heart {{ auth()->user()->hasFavorited($car->id) ? 'text-danger' : 'text-muted' }}"></i>
+                        </button>
+                    @endauth
+                </div>
                 <p>{{ $car->description ?: 'Premium vehicle available for rent. Experience luxury and comfort on your next journey.' }}</p>
 
                 <div class="spacer-10"></div>
@@ -397,6 +408,60 @@ document.addEventListener('DOMContentLoaded', function() {
         pickupDateInput.addEventListener('change', calculatePrice);
         returnDateInput.addEventListener('change', calculatePrice);
     }
+
+    // Handle favorite button on detail page
+    @auth
+    const favBtn = document.querySelector('.favorite-btn-detail');
+    if (favBtn) {
+        favBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const carId = this.dataset.carId;
+            const isFavorited = this.dataset.favorited === 'true';
+            const icon = this.querySelector('i');
+            
+            // Toggle favorite
+            const method = isFavorited ? 'DELETE' : 'POST';
+            const url = `/favorites/${carId}`;
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Toggle the favorited state
+                    this.dataset.favorited = isFavorited ? 'false' : 'true';
+                    
+                    // Update icon style and title
+                    if (isFavorited) {
+                        icon.classList.remove('text-danger');
+                        icon.classList.add('text-muted');
+                        this.title = 'Add to favorites';
+                    } else {
+                        icon.classList.remove('text-muted');
+                        icon.classList.add('text-danger');
+                        this.title = 'Remove from favorites';
+                    }
+                    
+                    // Show success message
+                    alert(data.message);
+                } else {
+                    alert(data.message || 'Failed to update favorites');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    }
+    @endauth
 });
 </script>
 @endpush

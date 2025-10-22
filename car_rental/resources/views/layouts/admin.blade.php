@@ -238,20 +238,6 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="alert('Bookings management coming soon!')">
-                    <i class="fas fa-fw fa-calendar-check"></i>
-                    <span>Bookings</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="alert('News management coming soon!')">
-                    <i class="fas fa-fw fa-newspaper"></i>
-                    <span>News</span>
-                </a>
-            </li>
-
             <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.15);">
 
             <li class="nav-item">

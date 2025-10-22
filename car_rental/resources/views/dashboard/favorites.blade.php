@@ -43,7 +43,6 @@
                         <ul class="menu-col">
                             <li><a href="{{ route('dashboard') }}"><i class="fa fa-home"></i>Dashboard</a></li>
                             <li><a href="{{ route('dashboard.profile') }}"><i class="fa fa-user"></i>My Profile</a></li>
-                            <li><a href="{{ route('dashboard.bookings') }}"><i class="fa fa-calendar"></i>My Orders</a></li>
                             <li><a href="{{ route('dashboard.favorites') }}" class="active"><i class="fa fa-car"></i>My Favorite Cars</a></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}" style="display: inline;">
@@ -83,10 +82,15 @@
                             </div>
                             <div class="d-price">
                                 Daily rate from <span>৳{{ number_format($car['daily_rate'] * 110, 0) }}</span>
-                                <a class="btn-main" href="#">Rent Now</a>
-                                <a class="btn btn-outline-danger btn-sm ms-2" href="#" onclick="removeFavorite({{ $car['id'] ?? 0 }})">
-                                    <i class="fa fa-heart-o"></i> Remove
-                                </a>
+                                @if($car['is_available'])
+                                    <a class="btn-main" href="{{ route('cars.show', $car['id']) }}">Rent Now</a>
+                                @else
+                                    <span class="badge badge-danger">Unavailable</span>
+                                @endif
+                                <button class="btn btn-outline-danger btn-sm ms-2 remove-favorite-btn" 
+                                        data-car-id="{{ $car['id'] }}">
+                                    <i class="fa fa-heart"></i> Remove
+                                </button>
                             </div>
                             <div class="clearfix"></div>
                         </div>
@@ -109,13 +113,52 @@
 <!-- content close -->
 
 <script>
-function removeFavorite(carId) {
-    if (confirm('Are you sure you want to remove this car from your favorites?')) {
-        // AJAX call to remove favorite (will be implemented when favorites system is built)
-        console.log('Remove favorite car with ID:', carId);
-        // For now, just reload the page
-        location.reload();
-    }
-}
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle remove favorite button clicks
+    document.querySelectorAll('.remove-favorite-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (!confirm('Are you sure you want to remove this car from your favorites?')) {
+                return;
+            }
+            
+            const carId = this.dataset.carId;
+            const carCard = this.closest('.de-item-list');
+            
+            fetch(`/favorites/${carId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the car card with animation
+                    carCard.style.transition = 'opacity 0.3s';
+                    carCard.style.opacity = '0';
+                    setTimeout(() => {
+                        carCard.remove();
+                        
+                        // Check if no more favorites
+                        const remainingCards = document.querySelectorAll('.de-item-list');
+                        if (remainingCards.length === 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                } else {
+                    alert(data.message || 'Failed to remove from favorites');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    });
+});
 </script>
 @endsection

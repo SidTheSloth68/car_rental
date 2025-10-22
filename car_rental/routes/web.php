@@ -87,6 +87,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings/{booking}/receipt', [BookingController::class, 'receipt'])->name('bookings.receipt');
     Route::get('/booking-summary', [BookingController::class, 'getSummary'])->name('bookings.summary');
     
+    // Favorites routes
+    Route::get('/favorites', [\App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/{car}', [\App\Http\Controllers\FavoriteController::class, 'store'])->name('favorites.store');
+    Route::delete('/favorites/{car}', [\App\Http\Controllers\FavoriteController::class, 'destroy'])->name('favorites.destroy');
+    
     // Admin News management routes
     Route::resource('admin/news', NewsController::class)->except(['index', 'show'])->names([
         'create' => 'admin.news.create',
@@ -110,8 +115,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     
     // Car Management
-    Route::resource('cars', \App\Http\Controllers\Admin\CarController::class);
-    Route::patch('/cars/{car}/toggle-availability', [\App\Http\Controllers\Admin\CarController::class, 'toggleAvailability'])->name('cars.toggle-availability');
+    Route::resource('cars', \App\Http\Controllers\Admin\AdminCarController::class);
+    Route::patch('/cars/{car}/toggle-availability', [\App\Http\Controllers\Admin\AdminCarController::class, 'toggleAvailability'])->name('cars.toggle-availability');
     
     // Booking Management
     Route::get('/bookings', [\App\Http\Controllers\Admin\AdminController::class, 'bookings'])->name('bookings');

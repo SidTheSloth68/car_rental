@@ -44,7 +44,7 @@ class ContactMail extends Mailable
             with: [
                 'name' => $this->contactData['name'],
                 'email' => $this->contactData['email'],
-                'message' => $this->contactData['message'],
+                'userMessage' => $this->contactData['message'],
                 'submittedAt' => now()->format('F j, Y \a\t g:i A')
             ]
         );

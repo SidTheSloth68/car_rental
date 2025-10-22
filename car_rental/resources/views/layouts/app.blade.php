@@ -54,10 +54,6 @@
         <link href="{{ asset('css/custom-1.css') }}" rel="stylesheet" type="text/css">
         <link id="colors" href="{{ asset('css/colors/scheme-01.css') }}" rel="stylesheet" type="text/css">
         
-        <!-- Dark Theme CSS -->
-        <link href="{{ asset('css/dark-theme.css') }}" rel="stylesheet" type="text/css">
-        <link href="{{ asset('css/theme-toggle.css') }}" rel="stylesheet" type="text/css">
-        
         <!-- Topbar Alignment Fix -->
         <link href="{{ asset('css/topbar-fix.css') }}" rel="stylesheet" type="text/css">
         
@@ -119,23 +115,6 @@
                         </div>
 
                         <div class="col-lg-3">
-                            <h5>Quick Links</h5>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="widget">
-                                        <ul>
-                                            <li><a href="#">About</a></li>
-                                            <li><a href="#">Blog</a></li>
-                                            <li><a href="#">Careers</a></li>
-                                            <li><a href="#">News</a></li>
-                                            <li><a href="#">Partners</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-3">
                             <div class="widget">
                                 <h5>Social Network</h5>
                                 <div class="social-icons">
@@ -175,9 +154,6 @@
         <!-- Caravel JavaScript Files -->
         <script src="{{ asset('js/plugins.js') }}"></script>
         <script src="{{ asset('js/designesia.js') }}"></script>
-        
-        <!-- Dark Theme Manager -->
-        <script src="{{ asset('js/theme-manager.js') }}"></script>
         
         <!-- Fix for menu items with submenus - allow parent link clicks -->
         <script>

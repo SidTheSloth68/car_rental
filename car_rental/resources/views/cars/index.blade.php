@@ -66,7 +66,17 @@
                                 <div class="d-text">
                                     <h4>{{ $car->make }} {{ $car->model }}</h4>
                                     <div class="d-item_like">
-                                        <i class="fa fa-heart"></i><span>{{ $car->favorites_count ?: 0 }}</span>
+                                        @auth
+                                            <button class="favorite-btn border-0 bg-transparent p-0" 
+                                                    data-car-id="{{ $car->id }}"
+                                                    data-favorited="{{ auth()->user()->hasFavorited($car->id) ? 'true' : 'false' }}"
+                                                    style="cursor: pointer;">
+                                                <i class="fa fa-heart {{ auth()->user()->hasFavorited($car->id) ? 'text-danger' : '' }}"></i>
+                                            </button>
+                                        @else
+                                            <i class="fa fa-heart"></i>
+                                        @endauth
+                                        <span class="favorite-count">{{ $car->favorites_count ?: 0 }}</span>
                                     </div>
                                     <div class="d-atr-group">
                                         <span class="d-atr"><img src="{{ asset('images/icons/1-green.svg') }}" alt="">{{ $car->seats }}</span>
@@ -76,11 +86,15 @@
                                     </div>
                                     <div class="d-price">
                                         Daily rate from <span>৳{{ number_format($car->price_per_day * 110, 0) }}</span>
-                                        @auth
-                                            <a class="btn-main" href="{{ route('cars.show', $car) }}">Rent Now</a>
+                                        @if($car->is_available)
+                                            @auth
+                                                <a class="btn-main" href="{{ route('cars.show', $car) }}">Rent Now</a>
+                                            @else
+                                                <a class="btn-main" href="{{ route('login') }}?message=rent">Rent Now</a>
+                                            @endauth
                                         @else
-                                            <a class="btn-main" href="{{ route('login') }}?message=rent">Rent Now</a>
-                                        @endauth
+                                            <span class="badge badge-danger mt-2" style="display: block; padding: 10px; background: #dc3545; color: white; font-size: 14px;">Currently Booked</span>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -110,5 +124,64 @@
         </div>
     </div>
 </section>
+
+@auth
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle favorite button clicks
+    document.querySelectorAll('.favorite-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const carId = this.dataset.carId;
+            const isFavorited = this.dataset.favorited === 'true';
+            const icon = this.querySelector('i');
+            const countSpan = this.nextElementSibling;
+            
+            // Toggle favorite
+            const method = isFavorited ? 'DELETE' : 'POST';
+            const url = `/favorites/${carId}`;
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Toggle the favorited state
+                    this.dataset.favorited = isFavorited ? 'false' : 'true';
+                    
+                    // Update icon style
+                    if (isFavorited) {
+                        icon.classList.remove('text-danger');
+                    } else {
+                        icon.classList.add('text-danger');
+                    }
+                    
+                    // Update count
+                    let currentCount = parseInt(countSpan.textContent) || 0;
+                    countSpan.textContent = isFavorited ? Math.max(0, currentCount - 1) : currentCount + 1;
+                    
+                    // Show success message (optional)
+                    console.log(data.message);
+                } else {
+                    alert(data.message || 'Failed to update favorites');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    });
+});
+</script>
+@endauth
 
 @endsection

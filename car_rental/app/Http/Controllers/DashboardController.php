@@ -21,54 +21,42 @@ class DashboardController extends Controller
         // Get real dashboard statistics from database
         $userBookings = $user->bookings();
         $stats = [
-            'upcoming_orders' => $userBookings->whereIn('status', ['confirmed', 'pending'])->count(),
+            'upcoming_orders' => $userBookings->where('status', 'active')->count(),
             'coupons' => 0, // TODO: Implement coupons system
             'total_orders' => $userBookings->count(),
-            'cancelled_orders' => $userBookings->where('status', 'cancelled')->count()
+            'cancelled_orders' => $userBookings->where('status', 'done')->count()
         ];
 
         // Get recent orders from database
         $recentBookings = $user->bookings()
-            ->with('car')
+            ->with(['car' => function($query) {
+                $query->withTrashed();
+            }])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
         $recentOrders = $recentBookings->map(function($booking) {
+            $carName = 'Unknown Car';
+            if ($booking->car) {
+                $carName = ($booking->car->make ?? 'Unknown') . ' ' . ($booking->car->model ?? '');
+            }
+            
+            // Map the 2-status system to display format
+            $displayStatus = $booking->status === 'active' ? 'scheduled' : 'completed';
+            
             return [
                 'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
-                'car_name' => $booking->car->make . ' ' . $booking->car->model,
+                'car_name' => $carName,
                 'pickup_location' => $booking->pickup_location,
                 'dropoff_location' => $booking->dropoff_location,
                 'pickup_date' => $booking->pickup_date->format('F j, Y'),
                 'return_date' => $booking->return_date->format('F j, Y'),
-                'status' => $booking->status
+                'status' => $displayStatus
             ];
         });
 
-        // Get favorite cars from available cars (top rated or most booked)
-        $favoriteCars = \App\Models\Car::where('available', true)
-            ->select('id', 'make', 'model', 'year', 'image', 'seats', 'luggage_capacity', 'doors', 'fuel_type', 'horsepower', 'engine_size', 'transmission', 'type', 'daily_rate')
-            ->orderBy('daily_rate', 'desc') // Show premium cars as favorites
-            ->take(6)
-            ->get()
-            ->map(function($car) {
-                return [
-                    'name' => $car->make . ' ' . $car->model,
-                    'image' => $car->image ?: 'images/cars/default.jpg',
-                    'seats' => $car->seats ?: 4,
-                    'luggage' => $car->luggage_capacity ?: 2,
-                    'doors' => $car->doors ?: 4,
-                    'fuel' => $car->fuel_type ?: 'Petrol',
-                    'horsepower' => $car->horsepower ?: 200,
-                    'engine' => $car->engine_size ?: 2000,
-                    'drive' => $car->transmission ?: 'Manual',
-                    'type' => $car->type ?: 'Sedan',
-                    'daily_rate' => $car->daily_rate ?: 100
-                ];
-            });
-
-        return view('dashboard.index', compact('user', 'stats', 'recentOrders', 'favoriteCars'));
+        return view('dashboard.index', compact('user', 'stats', 'recentOrders'));
     }
 
     /**
@@ -92,15 +80,22 @@ class DashboardController extends Controller
         $user = Auth::user();
         
         // Get real booking data
-        $bookings = $user->bookings()->with('car')->orderBy('created_at', 'desc')->get();
+        $bookings = $user->bookings()->with(['car' => function($query) {
+            $query->withTrashed();
+        }])->orderBy('created_at', 'desc')->get();
         
         // If there are real bookings, use them; otherwise, fall back to mock data
         if ($bookings->isNotEmpty()) {
             // Group real bookings by status for the view
-            $scheduledOrders = $bookings->where('status', 'confirmed')->map(function($booking) {
+            $scheduledOrders = $bookings->where('status', 'active')->map(function($booking) {
+                $carName = 'Unknown Car';
+                if ($booking->car) {
+                    $carName = ($booking->car->make ?? 'Unknown') . ' ' . ($booking->car->model ?? '');
+                }
+                
                 return [
                     'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
-                    'car_name' => $booking->car->make . ' ' . $booking->car->model,
+                    'car_name' => $carName,
                     'pickup_location' => $booking->pickup_location,
                     'dropoff_location' => $booking->dropoff_location,
                     'pickup_date' => $booking->pickup_date,
@@ -109,10 +104,15 @@ class DashboardController extends Controller
                 ];
             })->values();
             
-            $completedOrders = $bookings->where('status', 'completed')->map(function($booking) {
+            $completedOrders = $bookings->where('status', 'done')->map(function($booking) {
+                $carName = 'Unknown Car';
+                if ($booking->car) {
+                    $carName = ($booking->car->make ?? 'Unknown') . ' ' . ($booking->car->model ?? '');
+                }
+                
                 return [
                     'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
-                    'car_name' => $booking->car->make . ' ' . $booking->car->model,
+                    'car_name' => $carName,
                     'pickup_location' => $booking->pickup_location,
                     'dropoff_location' => $booking->dropoff_location,
                     'pickup_date' => $booking->pickup_date,
@@ -121,17 +121,8 @@ class DashboardController extends Controller
                 ];
             })->values();
             
-            $cancelledOrders = $bookings->where('status', 'cancelled')->map(function($booking) {
-                return [
-                    'id' => '#' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
-                    'car_name' => $booking->car->make . ' ' . $booking->car->model,
-                    'pickup_location' => $booking->pickup_location,
-                    'dropoff_location' => $booking->dropoff_location,
-                    'pickup_date' => $booking->pickup_date,
-                    'return_date' => $booking->return_date,
-                    'status' => 'cancelled'
-                ];
-            })->values();
+            // No cancelled orders in 2-status system, so empty array
+            $cancelledOrders = collect([]);
         } else {
             // Fall back to mock data if no real bookings exist
             $scheduledOrders = collect([]);
@@ -151,19 +142,24 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // TODO: Implement user favorites system with a favorites table
-        // For now, show available premium cars as sample favorites
-        $favoriteCars = Car::where('available', true)
-            ->where('daily_rate', '>', 200) // Show premium cars as favorites
-            ->select('id', 'make', 'model', 'year', 'image', 'seats', 'luggage_capacity', 'doors', 'fuel_type', 'horsepower', 'engine_size', 'transmission', 'type', 'daily_rate')
-            ->orderBy('daily_rate', 'desc')
-            ->take(6)
+        // Get actual user favorites from the database
+        $favoriteCars = $user->favorites()
+            ->select('cars.id', 'cars.make', 'cars.model', 'cars.year', 'cars.image', 'cars.gallery', 'cars.seats', 'cars.luggage_capacity', 'cars.doors', 'cars.fuel_type', 'cars.horsepower', 'cars.engine_size', 'cars.transmission', 'cars.type', 'cars.daily_rate', 'cars.is_available')
             ->get()
             ->map(function($car) {
+                // Determine the image path
+                $imagePath = 'images/cars/default-car.jpg'; // default fallback
+                
+                if ($car->gallery && is_array($car->gallery) && count($car->gallery) > 0) {
+                    $imagePath = 'images/cars/' . $car->gallery[0];
+                } elseif ($car->image) {
+                    $imagePath = 'images/cars/' . $car->image;
+                }
+                
                 return [
                     'id' => $car->id,
                     'name' => $car->make . ' ' . $car->model,
-                    'image' => $car->image ?: 'images/cars/default.jpg',
+                    'image' => $imagePath,
                     'seats' => $car->seats ?: 4,
                     'luggage' => $car->luggage_capacity ?: 2,
                     'doors' => $car->doors ?: 4,
@@ -172,7 +168,8 @@ class DashboardController extends Controller
                     'engine' => $car->engine_size ?: 2000,
                     'drive' => $car->transmission ?: 'Manual',
                     'type' => $car->type ?: 'Sedan',
-                    'daily_rate' => $car->daily_rate ?: 100
+                    'daily_rate' => $car->daily_rate ?: 100,
+                    'is_available' => $car->is_available
                 ];
             });
         

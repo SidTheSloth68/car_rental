@@ -24,6 +24,8 @@ class User extends Authenticatable
         'role',
         'phone',
         'address',
+        'language',
+        'hour_format',
         'date_of_birth',
         'license_number',
         'license_expiry',
@@ -34,7 +36,6 @@ class User extends Authenticatable
         'emergency_contact_phone',
         'is_active',
         'last_login_at',
-        'total_bookings',
         'loyalty_points',
         'preferred_payment_method',
         'email_verified_at',
@@ -69,6 +70,22 @@ class User extends Authenticatable
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Get the user's favorite cars.
+     */
+    public function favorites()
+    {
+        return $this->belongsToMany(Car::class, 'favorites')->withTimestamps();
+    }
+
+    /**
+     * Check if user has favorited a car.
+     */
+    public function hasFavorited($carId): bool
+    {
+        return $this->favorites()->where('car_id', $carId)->exists();
     }
 
     /**

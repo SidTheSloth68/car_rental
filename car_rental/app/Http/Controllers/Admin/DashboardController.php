@@ -25,17 +25,19 @@ class DashboardController extends Controller
             'total_customers' => User::where('role', 'customer')->count(),
             'total_admins' => User::where('role', 'admin')->count(),
             'total_cars' => Car::count(),
-            'available_cars' => Car::where('available', true)->count(),
+            'available_cars' => Car::where('is_available', true)->count(),
             'total_bookings' => Booking::count(),
             'pending_bookings' => Booking::where('status', 'pending')->count(),
-            'confirmed_bookings' => Booking::where('status', 'confirmed')->count(),
+            'confirmed_bookings' => Booking::where('status', 'active')->count(),
             'total_news' => News::count(),
             'published_news' => News::where('status', 'published')->count(),
         ];
 
         // Recent activities
         $recent_users = User::latest()->take(5)->get();
-        $recent_bookings = Booking::with(['car', 'user'])->latest()->take(5)->get();
+        $recent_bookings = Booking::with(['car' => function($query) {
+            $query->withTrashed();
+        }, 'user'])->latest()->take(5)->get();
         $recent_cars = Car::latest()->take(5)->get();
         $recent_news = News::latest()->take(5)->get();
 
@@ -51,8 +53,8 @@ class DashboardController extends Controller
 
         // Revenue statistics (if you have pricing)
         $revenue_stats = [
-            'total_revenue' => Booking::where('status', '!=', 'cancelled')->sum('final_amount') ?? 0,
-            'monthly_revenue' => Booking::where('status', '!=', 'cancelled')
+            'total_revenue' => Booking::whereIn('status', ['active', 'done'])->sum('final_amount') ?? 0,
+            'monthly_revenue' => Booking::whereIn('status', ['active', 'done'])
                 ->where(DB::raw("strftime('%Y-%m', created_at)"), '=', now()->format('Y-m'))
                 ->sum('final_amount') ?? 0,
         ];

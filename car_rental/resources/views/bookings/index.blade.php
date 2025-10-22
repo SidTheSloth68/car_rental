@@ -59,8 +59,8 @@
                                     <tr>
                                         <td><strong>{{ $booking->booking_number }}</strong></td>
                                         <td>
-                                            {{ $booking->car->brand }} {{ $booking->car->model }}<br>
-                                            <small class="text-muted">{{ $booking->car->year }}</small>
+                                            {{ $booking->car->make ?? 'N/A' }} {{ $booking->car->model ?? '' }}<br>
+                                            <small class="text-muted">{{ $booking->car->year ?? '' }}</small>
                                         </td>
                                         <td>{{ $booking->pickup_date->format('M d, Y') }}</td>
                                         <td>{{ $booking->return_date->format('M d, Y') }}</td>
@@ -69,15 +69,13 @@
                                         <td>
                                             @php
                                                 $statusClass = match($booking->status) {
-                                                    'pending' => 'warning',
-                                                    'confirmed' => 'success',
-                                                    'completed' => 'info',
-                                                    'cancelled' => 'danger',
+                                                    'active' => 'success',
+                                                    'done' => 'info',
                                                     default => 'secondary'
                                                 };
                                             @endphp
                                             <span class="badge bg-{{ $statusClass }}">
-                                                {{ ucfirst($booking->status) }}
+                                                {{ $booking->status === 'active' ? 'Active' : 'Done' }}
                                             </span>
                                         </td>
                                         <td>
@@ -91,25 +89,24 @@
                                                 };
                                             @endphp
                                             <span class="badge bg-{{ $paymentClass }}">
-                                                {{ ucfirst($booking->payment_status) }}
+                                                @if($booking->payment_status === 'pending' && $booking->payment_method === 'cash' && $booking->status === 'active')
+                                                    Pay on Return
+                                                @else
+                                                    {{ ucfirst($booking->payment_status) }}
+                                                @endif
                                             </span>
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group">
                                                 <a href="{{ route('bookings.show', $booking) }}" class="btn btn-sm btn-primary" title="View Details">
-                                                    <i class="fa fa-eye"></i>
+                                                    <i class="fa fa-eye"></i> View Details
                                                 </a>
-                                                @if($booking->status === 'pending')
-                                                    <a href="{{ route('bookings.edit', $booking) }}" class="btn btn-sm btn-warning" title="Edit">
-                                                        <i class="fa fa-edit"></i>
-                                                    </a>
-                                                @endif
-                                                @if($booking->status !== 'cancelled' && $booking->status !== 'completed')
-                                                    <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                                @if($booking->status === 'active')
+                                                    <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to mark this booking as complete? This will finalize the service and process any pending payments.');">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" class="btn btn-sm btn-danger" title="Cancel">
-                                                            <i class="fa fa-times"></i>
+                                                        <button type="submit" class="btn btn-sm btn-success" title="Complete Service">
+                                                            <i class="fa fa-check"></i> Complete Service
                                                         </button>
                                                     </form>
                                                 @endif

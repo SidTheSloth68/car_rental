@@ -67,7 +67,7 @@
         
         <div class="field">
             <label>Message:</label>
-            <div class="field-value">{{ $message }}</div>
+            <div class="field-value">{{ $userMessage }}</div>
         </div>
         
         <div class="field">
