@@ -24,8 +24,6 @@ class SimpleUserSeeder extends Seeder
                 'role' => 'admin',
                 'phone' => '+1-555-0101',
                 'address' => '123 Admin Street, City Center, NY 10001',
-                'is_active' => true,
-                'loyalty_points' => 0,
             ],
             [
                 'name' => 'Super Admin',
@@ -35,8 +33,6 @@ class SimpleUserSeeder extends Seeder
                 'role' => 'admin',
                 'phone' => '+1-555-0102',
                 'address' => '456 Admin Avenue, Business District, NY 10002',
-                'is_active' => true,
-                'loyalty_points' => 0,
             ]
         ];
 
@@ -57,8 +53,6 @@ class SimpleUserSeeder extends Seeder
                 'role' => 'user',
                 'phone' => '+1-555-1001',
                 'address' => '789 User Lane, Residential Area, NY 10003',
-                'is_active' => true,
-                'loyalty_points' => 100,
             ],
             [
                 'name' => 'Jane Smith',
@@ -68,8 +62,6 @@ class SimpleUserSeeder extends Seeder
                 'role' => 'user',
                 'phone' => '+1-555-1002',
                 'address' => '321 Customer Street, Suburb Heights, NY 10004',
-                'is_active' => true,
-                'loyalty_points' => 250,
             ],
             [
                 'name' => 'Michael Johnson',
@@ -79,8 +71,6 @@ class SimpleUserSeeder extends Seeder
                 'role' => 'user',
                 'phone' => '+1-555-1003',
                 'address' => '654 Family Avenue, Downtown, NY 10005',
-                'is_active' => true,
-                'loyalty_points' => 75,
             ],
             [
                 'name' => 'Sarah Wilson',
@@ -90,8 +80,6 @@ class SimpleUserSeeder extends Seeder
                 'role' => 'user',
                 'phone' => '+1-555-1004',
                 'address' => '987 Business Boulevard, Corporate District, NY 10006',
-                'is_active' => true,
-                'loyalty_points' => 500,
             ],
             [
                 'name' => 'Robert Brown',
@@ -101,8 +89,6 @@ class SimpleUserSeeder extends Seeder
                 'role' => 'user',
                 'phone' => '+1-555-1005',
                 'address' => '147 Traveler Road, Airport District, NY 10007',
-                'is_active' => true,
-                'loyalty_points' => 180,
             ]
         ];
 

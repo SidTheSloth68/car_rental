@@ -31,8 +31,6 @@ class UserFactory extends Factory
             'role' => 'user', // Default role
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
-            'is_active' => true,
-            'loyalty_points' => 0,
             'remember_token' => Str::random(10),
         ];
     }

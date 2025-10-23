@@ -142,22 +142,11 @@ class CarFactory extends Factory
             'doors' => $doors,
             'luggage_capacity' => $this->faker->randomElement(['1 bag', '2 bags', '3 bags', '4 bags', '5+ bags']),
             'daily_rate' => round($basePrice, 2),
-            'weekly_rate' => round($basePrice * 6, 2), // 6x daily rate (1 day discount)
-            'monthly_rate' => round($basePrice * 24, 2), // 24x daily rate (6 days discount)
-            'color' => $this->faker->randomElement($colors),
-            'mileage' => $mileage,
-            'engine_size' => $this->faker->randomElement($engineSizes),
-            'horsepower' => $horsepower,
             'features' => $features,
             'description' => $this->generateCarDescription($make, $model, $year, $features),
             'image' => $images[0] ?? 'cars/default.jpg',
-            'gallery' => $images,
             'is_available' => $this->faker->boolean(85), // 85% chance of being available
-            'is_featured' => $this->faker->boolean(20), // 20% chance of being featured
             'location' => $this->faker->randomElement($locations),
-            'total_bookings' => $this->faker->numberBetween(0, 500),
-            'average_rating' => $this->faker->randomFloat(1, 3.0, 5.0),
-            'likes_count' => $this->faker->numberBetween(0, 200),
             'license_plate' => $this->generateLicensePlate(),
             'vin' => $this->generateVIN($make),
             'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
@@ -262,7 +251,6 @@ class CarFactory extends Factory
     public function featured(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_featured' => true,
         ]);
     }
 
@@ -287,8 +275,6 @@ class CarFactory extends Factory
                 'model' => $this->faker->randomElement($luxuryModels[$make]),
                 'type' => $this->faker->randomElement(['luxury', 'premium', 'suv']),
                 'daily_rate' => $this->faker->numberBetween(150, 350),
-                'weekly_rate' => $this->faker->numberBetween(900, 2100),
-                'monthly_rate' => $this->faker->numberBetween(3600, 8400),
                 'features' => [
                     'Premium Leather Seats',
                     'Panoramic Sunroof',
@@ -301,7 +287,6 @@ class CarFactory extends Factory
                     'Bluetooth',
                     'All-Wheel Drive'
                 ],
-                'is_featured' => true,
             ];
         });
     }
@@ -328,8 +313,6 @@ class CarFactory extends Factory
                 'model' => $this->faker->randomElement($economyModels[$make]),
                 'type' => $this->faker->randomElement(['economy', 'compact', 'standard']),
                 'daily_rate' => $this->faker->numberBetween(35, 65),
-                'weekly_rate' => $this->faker->numberBetween(210, 390),
-                'monthly_rate' => $this->faker->numberBetween(840, 1560),
                 'features' => [
                     'Air Conditioning',
                     'GPS Navigation',
@@ -364,10 +347,7 @@ class CarFactory extends Factory
                 'model' => $this->faker->randomElement($electricModels[$make]),
                 'fuel_type' => 'electric',
                 'transmission' => 'automatic',
-                'engine_size' => null,
                 'daily_rate' => $this->faker->numberBetween(75, 200),
-                'weekly_rate' => $this->faker->numberBetween(450, 1200),
-                'monthly_rate' => $this->faker->numberBetween(1800, 4800),
                 'features' => [
                     'Electric Powertrain',
                     'Regenerative Braking',
