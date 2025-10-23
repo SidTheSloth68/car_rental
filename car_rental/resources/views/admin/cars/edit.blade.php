@@ -214,22 +214,12 @@
             <hr class="my-4">
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="is_available" name="is_available" 
                                {{ old('is_available', $car->is_available) ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_available">
                             Available for Rent
-                        </label>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" 
-                               {{ old('is_featured', $car->is_featured) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="is_featured">
-                            Featured Car
                         </label>
                     </div>
                 </div>

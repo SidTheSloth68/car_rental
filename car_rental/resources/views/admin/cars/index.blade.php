@@ -97,9 +97,6 @@
                                 <div class="col-6">
                                     <i class="fas fa-gas-pump text-gray-400"></i> {{ ucfirst($car->fuel_type) }}
                                 </div>
-                                <div class="col-6">
-                                    <i class="fas fa-tachometer-alt text-gray-400"></i> {{ number_format($car->mileage) }} mi
-                                </div>
                             </div>
                         </div>
                         
@@ -109,9 +106,6 @@
                                     <span class="h5 text-success font-weight-bold">৳{{ number_format($car->daily_rate * 110, 0) }}</span>
                                     <small class="text-muted">/day</small>
                                 </div>
-                                @if($car->license_plate)
-                                    <small class="text-muted">{{ $car->license_plate }}</small>
-                                @endif
                             </div>
                         </div>
                         
@@ -271,18 +265,6 @@
                                        step="0.01" min="0" required>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group mb-3">
-                                <label for="mileage">Mileage</label>
-                                <input type="number" class="form-control" id="mileage" name="mileage" min="0">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group mb-3">
-                                <label for="license_plate">License Plate</label>
-                                <input type="text" class="form-control" id="license_plate" name="license_plate">
-                            </div>
-                        </div>
                     </div>
                     
                     <div class="form-group mb-3">
@@ -380,7 +362,6 @@ function viewCar(carId) {
                                             <tr><td><strong>Fuel Type:</strong></td><td>${car.fuel_type}</td></tr>
                                             <tr><td><strong>Daily Rate:</strong></td><td>$${car.daily_rate}</td></tr>
                                             <tr><td><strong>Status:</strong></td><td><span class="badge bg-${car.is_available ? 'success' : 'danger'}">${car.is_available ? 'Available' : 'Unavailable'}</span></td></tr>
-                                            <tr><td><strong>Featured:</strong></td><td>${car.is_featured ? 'Yes' : 'No'}</td></tr>
                                         </table>
                                     </div>
                                 </div>

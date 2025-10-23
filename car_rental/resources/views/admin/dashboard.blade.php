@@ -56,49 +56,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Bookings Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Bookings</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($stats['total_bookings']) }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                    <div class="mt-2 text-sm">
-                        <span class="text-warning">{{ $stats['pending_bookings'] }}</span> pending, 
-                        <span class="text-success">{{ $stats['confirmed_bookings'] }}</span> confirmed
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Revenue Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Total Revenue</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">৳{{ number_format($revenue_stats['total_revenue'] * 110, 0) }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-bangladeshi-taka-sign fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                    <div class="mt-2 text-sm">
-                        This month: <span class="text-success">৳{{ number_format($revenue_stats['monthly_revenue'] * 110, 0) }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Content Row - Recent Activities -->
@@ -219,46 +176,8 @@
                 </div>
             </div>
         </div>
-
-        <!-- News Summary -->
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-warning">Content Management</h6>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                            <span>Total Articles</span>
-                            <span class="font-weight-bold">{{ $stats['total_news'] }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Published</span>
-                            <span class="font-weight-bold text-success">{{ $stats['published_news'] }}</span>
-                        </div>
-                    </div>
-                    
-                    <h6 class="font-weight-bold">Recent Articles:</h6>
-                    @forelse($recent_news->take(3) as $article)
-                        <div class="py-2 border-bottom">
-                            <div class="font-weight-bold text-sm">{{ Str::limit($article->title, 40) }}</div>
-                            <div class="text-muted small">
-                                {{ $article->created_at->format('M d, Y') }} - 
-                                <span class="badge badge-{{ $article->status === 'published' ? 'success' : 'warning' }}">
-                                    {{ ucfirst($article->status) }}
-                                </span>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-muted small">No articles found.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
     </div>
-</div>
-
-<style>
+</div><style>
 .icon-circle {
     height: 2.5rem;
     width: 2.5rem;
