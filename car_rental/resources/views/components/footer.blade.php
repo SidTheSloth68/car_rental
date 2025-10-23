@@ -13,8 +13,8 @@
                 <div class="widget">
                     <h5>Contact Info</h5>
                     <address class="s1">
-                        <span><i class="id-color fa fa-map-marker fa-lg"></i>08 W 36th St, New York, NY 10001</span>
-                        <span><i class="id-color fa fa-phone fa-lg"></i>+1 333 9296</span>
+                        <span><i class="id-color fa fa-map-marker fa-lg"></i>Mirpur 12, Dhaka 1216</span>
+                        <span><i class="id-color fa fa-phone fa-lg"></i>01712345678</span>
                         <span><i class="id-color fa fa-envelope-o fa-lg"></i><a href="mailto:contact@caravel.com">contact@caravel.com</a></span>
                         <span><i class="id-color fa fa-file-pdf-o fa-lg"></i><a href="#">Download Brochure</a></span>
                     </address>

@@ -30,7 +30,11 @@
                     <div class="card p-4 rounded-5">
                         <div class="profile_avatar">
                             <div class="profile_img">
-                                <img src="{{ asset('images/profile/1.jpg') }}" alt="">
+                                @if(Auth::user()->profile_photo)
+                                    <img src="{{ asset(Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}">
+                                @else
+                                    <img src="{{ asset('images/profile/1.jpg') }}" alt="{{ Auth::user()->name }}">
+                                @endif
                             </div>
                             <div class="profile_name">
                                 <h4>
@@ -72,10 +76,8 @@
                                             <li><span>Luggage:</span>{{ $car['luggage'] }}</li>
                                             <li><span>Doors:</span>{{ $car['doors'] }}</li>
                                             <li><span>Fuel:</span>{{ $car['fuel'] }}</li>
-                                            <li><span>Horsepower:</span>{{ $car['horsepower'] }}</li>
-                                            <li><span>Engine:</span>{{ $car['engine'] }}</li>
-                                            <li><span>Drive:</span>{{ $car['drive'] }}</li>
-                                            <li><span>Type:</span>{{ $car['type'] }}</li>
+                                            <li><span>Transmission:</span>{{ $car['drive'] }}</li>
+                                            <li><span>Type:</span>{{ ucfirst(str_replace('_', ' ', $car['type'])) }}</li>
                                         </ul>
                                     </div>
                                 </div>

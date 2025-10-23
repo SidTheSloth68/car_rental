@@ -528,10 +528,313 @@
 
 @push('scripts')
 <script>
-// Initialize Google Maps if needed
-function initialize() {
-    // Google Maps initialization will be added later
-    console.log('Page initialized');
-}
+// Homepage Smooth Enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ========================================
+    // 1. SMOOTH SCROLL FOR ALL LINKS
+    // ========================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // ========================================
+    // 2. ANIMATED COUNTER (Numbers that count up)
+    // ========================================
+    function animateCounter(element, target, duration) {
+        let start = 0;
+        const increment = target / (duration / 16); // 60fps
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+                element.textContent = target.toLocaleString();
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(start).toLocaleString();
+            }
+        }, 16);
+    }
+
+    // Trigger counters when they come into view
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px'
+    };
+
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                entry.target.classList.add('counted');
+                const target = parseInt(entry.target.dataset.to);
+                animateCounter(entry.target, target, 2000);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.timer').forEach(counter => {
+        counterObserver.observe(counter);
+    });
+
+    // ========================================
+    // 3. PARALLAX SCROLL EFFECT
+    // ========================================
+    window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const parallaxElements = document.querySelectorAll('.jarallax-img');
+        
+        parallaxElements.forEach(element => {
+            const speed = 0.5;
+            element.style.transform = `translateY(${scrolled * speed}px)`;
+        });
+    });
+
+    // ========================================
+    // 4. FADE IN ON SCROLL ANIMATION
+    // ========================================
+    const fadeElements = document.querySelectorAll('.wow');
+    
+    const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '0';
+                entry.target.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    entry.target.style.transition = 'all 0.8s ease-out';
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, 100);
+                
+                fadeObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    fadeElements.forEach(element => {
+        fadeObserver.observe(element);
+    });
+
+    // ========================================
+    // 5. SMOOTH HOVER EFFECTS FOR CARDS
+    // ========================================
+    const stepBoxes = document.querySelectorAll('.de-step-box');
+    stepBoxes.forEach(box => {
+        box.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+        
+        box.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px)';
+            this.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.3)';
+        });
+        
+        box.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+
+    // ========================================
+    // 6. FEATURE BOXES HOVER ANIMATION
+    // ========================================
+    const featureBoxes = document.querySelectorAll('.box-icon');
+    featureBoxes.forEach(box => {
+        box.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+        
+        box.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.style.transition = 'transform 0.3s ease';
+                icon.style.transform = 'rotate(5deg) scale(1.1)';
+            }
+        });
+        
+        box.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.style.transform = 'rotate(0deg) scale(1)';
+            }
+        });
+    });
+
+    // ========================================
+    // 7. STEP NUMBER PULSE ANIMATION
+    // ========================================
+    const stepNumbers = document.querySelectorAll('.d-step-number');
+    stepNumbers.forEach(number => {
+        number.style.transition = 'all 0.3s ease';
+        
+        const parentBox = number.closest('.de-step-box');
+        if (parentBox) {
+            parentBox.addEventListener('mouseenter', function() {
+                number.style.transform = 'scale(1.15) rotate(5deg)';
+                number.style.boxShadow = '0 5px 20px rgba(139, 195, 74, 0.5)';
+            });
+            
+            parentBox.addEventListener('mouseleave', function() {
+                number.style.transform = 'scale(1) rotate(0deg)';
+                number.style.boxShadow = 'none';
+            });
+        }
+    });
+
+    // ========================================
+    // 8. BACK TO TOP BUTTON
+    // ========================================
+    const backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.style.opacity = '1';
+                backToTop.style.visibility = 'visible';
+                backToTop.style.transform = 'translateY(0)';
+            } else {
+                backToTop.style.opacity = '0';
+                backToTop.style.visibility = 'hidden';
+                backToTop.style.transform = 'translateY(20px)';
+            }
+        });
+
+        backToTop.style.transition = 'all 0.3s ease';
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // ========================================
+    // 9. SMOOTH MARQUEE ANIMATION
+    // ========================================
+    const marqueeContainers = document.querySelectorAll('.de-marquee-list');
+    marqueeContainers.forEach(container => {
+        const items = container.querySelectorAll('.d-item-txt');
+        items.forEach(item => {
+            item.style.transition = 'color 0.3s ease, transform 0.3s ease';
+            
+            item.addEventListener('mouseenter', function() {
+                this.style.color = '#8bc34a';
+                this.style.transform = 'scale(1.2)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.color = '';
+                this.style.transform = 'scale(1)';
+            });
+        });
+    });
+
+    // ========================================
+    // 10. CAR ITEMS STAGGER ANIMATION
+    // ========================================
+    const carItems = document.querySelectorAll('.de-item');
+    carItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(30px)';
+        item.style.transition = 'all 0.6s ease';
+        
+        setTimeout(() => {
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+
+    // ========================================
+    // 11. SMOOTH IMAGE LOADING
+    // ========================================
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.style.transition = 'opacity 0.5s ease';
+        
+        if (!img.complete) {
+            img.style.opacity = '0';
+            img.addEventListener('load', function() {
+                this.style.opacity = '1';
+            });
+        }
+    });
+
+    // ========================================
+    // 12. CALL TO ACTION PHONE PULSE
+    // ========================================
+    const phoneButton = document.querySelector('.phone-num-big');
+    if (phoneButton) {
+        setInterval(() => {
+            phoneButton.style.transition = 'transform 0.3s ease';
+            phoneButton.style.transform = 'scale(1.05)';
+            
+            setTimeout(() => {
+                phoneButton.style.transform = 'scale(1)';
+            }, 300);
+        }, 3000);
+    }
+
+    // ========================================
+    // 13. HERO SECTION ENTRANCE ANIMATION
+    // ========================================
+    const heroSection = document.querySelector('.jarallax');
+    if (heroSection) {
+        heroSection.style.opacity = '0';
+        setTimeout(() => {
+            heroSection.style.transition = 'opacity 1s ease';
+            heroSection.style.opacity = '1';
+        }, 100);
+    }
+
+    // ========================================
+    // 14. BUTTON RIPPLE EFFECT
+    // ========================================
+    const buttons = document.querySelectorAll('.btn-main, .btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.animation = 'ripple 0.6s ease-out';
+            ripple.style.pointerEvents = 'none';
+            
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+
+    // CSS for ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    console.log('✨ Homepage smooth enhancements loaded successfully!');
+});
 </script>
 @endpush

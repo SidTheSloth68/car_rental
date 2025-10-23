@@ -30,7 +30,11 @@
                     <div class="card p-4 rounded-5">
                         <div class="profile_avatar">
                             <div class="profile_img">
-                                <img src="{{ asset('images/profile/1.jpg') }}" alt="">
+                                @if(Auth::user()->profile_photo)
+                                    <img src="{{ asset(Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}">
+                                @else
+                                    <img src="{{ asset('images/profile/1.jpg') }}" alt="{{ Auth::user()->name }}">
+                                @endif
                             </div>
                             <div class="profile_name">
                                 <h4>
@@ -77,14 +81,13 @@
                                     </div>
                                 @endif
 
-                                <form id="form-create-item" class="form-border" method="post" action="{{ route('profile.update') }}">
+                                <form id="form-create-item" class="form-border" method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                                     @csrf
                                     @method('patch')
                                     
                                     <div class="de_tab tab_simple">
                                         <ul class="de_nav">
                                             <li class="active"><span>Profile</span></li>
-                                            <li><span>Notifications</span></li>
                                         </ul>
                                         
                                         <div class="de_tab_content">                            
@@ -101,6 +104,29 @@
                                                         <input type="email" name="email" id="email" class="form-control" 
                                                                placeholder="Enter email" 
                                                                value="{{ old('email', Auth::user()->email) }}" />
+                                                    </div>
+                                                    <div class="col-lg-6 mb20">
+                                                        <h5>Profile Picture</h5>
+                                                        <input type="file" name="profile_photo" id="profile_photo" class="form-control" accept="image/*" />
+                                                        <p class="p-info mb-0"><small>Max 2MB (JPG, PNG, GIF)</small></p>
+                                                        @if(Auth::user()->profile_photo)
+                                                            <div class="mt-2">
+                                                                <img src="{{ asset(Auth::user()->profile_photo) }}" alt="Current profile photo" class="rounded" style="max-width: 100px;">
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <div class="col-lg-6 mb20">
+                                                        <h5>Phone Number</h5>
+                                                        <input type="tel" name="phone" id="phone" class="form-control" 
+                                                               placeholder="Enter phone number" 
+                                                               value="{{ old('phone', Auth::user()->phone) }}" />
+                                                    </div>
+                                                    <div class="col-lg-6 mb20">
+                                                        <h5>Driver's License Number</h5>
+                                                        <input type="text" name="license_number" id="license_number" class="form-control" 
+                                                               placeholder="Enter your license number" 
+                                                               value="{{ old('license_number', Auth::user()->license_number) }}" />
+                                                        <p class="p-info mb-0"><small>This will auto-fill when booking a car</small></p>
                                                     </div>
                                                     <div class="col-lg-6 mb20">
                                                         <h5>New Password</h5>
@@ -131,60 +157,6 @@
                                                             <option value="12-hour" {{ old('hour_format', $user->hour_format) == '12-hour' ? 'selected' : '' }}>12-hour</option>
                                                         </select>
                                                     </div>                               
-                                                </div>
-                                            </div>
-
-                                            <div class="tab-2">
-                                                <div class="row">
-                                                    <div class="col-md-6 mb-sm-20">
-                                                        <div class="switch-with-title s2">
-                                                            <h5>Discount Notifications</h5>
-                                                            <div class="de-switch">
-                                                                <input type="checkbox" id="notif-item-sold" class="checkbox">
-                                                                <label for="notif-item-sold"></label>
-                                                            </div>
-                                                            <div class="clearfix"></div>
-                                                            <p class="p-info">You'll get notification when new discounts are available.</p>
-                                                        </div>
-
-                                                        <div class="spacer-20"></div>
-
-                                                        <div class="switch-with-title s2">
-                                                            <h5>New Car Notifications</h5>
-                                                            <div class="de-switch">
-                                                                <input type="checkbox" id="notif-bid-activity" class="checkbox">
-                                                                <label for="notif-bid-activity"></label>
-                                                            </div>
-                                                            <div class="clearfix"></div>
-                                                            <p class="p-info">You'll get notification when new cars are available.</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <div class="switch-with-title s2">
-                                                            <h5>Daily Reports</h5>
-                                                            <div class="de-switch">
-                                                                <input type="checkbox" id="notif-auction-expiration" class="checkbox">
-                                                                <label for="notif-auction-expiration"></label>
-                                                            </div>
-                                                            <div class="clearfix"></div>
-                                                            <p class="p-info">We will send you a report every day.</p>
-                                                        </div>
-
-                                                        <div class="spacer-20"></div>
-
-                                                        <div class="switch-with-title s2">
-                                                            <h5>Monthly Reports</h5>
-                                                            <div class="de-switch">
-                                                                <input type="checkbox" id="notif-outbid" class="checkbox">
-                                                                <label for="notif-outbid"></label>
-                                                            </div>
-                                                            <div class="clearfix"></div>
-                                                            <p class="p-info">We will send you a report each month.</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="spacer-20"></div>
                                                 </div>
                                             </div>
                                         </div>

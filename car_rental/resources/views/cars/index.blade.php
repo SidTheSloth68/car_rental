@@ -54,9 +54,7 @@
                     <div class="col-xl-4 col-lg-6">
                         <div class="de-item mb30">
                             <div class="d-img">
-                                @if($car->gallery && is_array($car->gallery) && count($car->gallery) > 0)
-                                    <img src="{{ asset('images/cars/' . $car->gallery[0]) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
-                                @elseif($car->image)
+                                @if($car->image)
                                     <img src="{{ asset('images/cars/' . $car->image) }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
                                 @else
                                     <img src="{{ asset('images/cars/default-car.jpg') }}" class="img-fluid" alt="{{ $car->make }} {{ $car->model }}">
@@ -112,11 +110,45 @@
 
                 <!-- Pagination -->
                 @if($cars->hasPages())
-                <div class="row">
+                <div class="row mt-5">
                     <div class="col-12">
-                        <div class="d-flex justify-content-center">
-                            {{ $cars->appends(request()->query())->links() }}
-                        </div>
+                        <div class="spacer-single"></div>
+                        <ul class="pagination justify-content-center">
+                            {{-- Previous Page Link --}}
+                            @if ($cars->onFirstPage())
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $cars->appends(request()->query())->previousPageUrl() }}" rel="prev">Previous</a>
+                                </li>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($cars->getUrlRange(1, $cars->lastPage()) as $page => $url)
+                                @if ($page == $cars->currentPage())
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ $page }}</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $cars->appends(request()->query())->url($page) }}">{{ $page }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($cars->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $cars->appends(request()->query())->nextPageUrl() }}" rel="next">Next</a>
+                                </li>
+                            @else
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                            @endif
+                        </ul>
                     </div>
                 </div>
                 @endif

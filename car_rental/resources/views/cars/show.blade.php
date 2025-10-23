@@ -24,13 +24,7 @@
         <div class="row g-5">
             <div class="col-lg-6">
                 <div id="slider-carousel" class="owl-carousel">
-                    @if($car->gallery && is_array($car->gallery) && count($car->gallery) > 0)
-                        @foreach($car->gallery as $image)
-                        <div class="item">
-                            <img src="{{ asset('images/cars/' . $image) }}" alt="{{ $car->make }} {{ $car->model }}">
-                        </div>
-                        @endforeach
-                    @elseif($car->image)
+                    @if($car->image)
                         <div class="item">
                             <img src="{{ asset('images/cars/' . $car->image) }}" alt="{{ $car->make }} {{ $car->model }}">
                         </div>
@@ -83,22 +77,10 @@
                         <span class="d-title">Fuel Type</span>
                         <span class="d-value">{{ ucfirst($car->fuel_type) }}</span>
                     </div>
-                    @if($car->engine_size)
-                    <div class="d-row">
-                        <span class="d-title">Engine</span>
-                        <span class="d-value">{{ $car->engine_size }}L</span>
-                    </div>
-                    @endif
                     <div class="d-row">
                         <span class="d-title">Year</span>
                         <span class="d-value">{{ $car->year }}</span>
                     </div>
-                    @if($car->mileage)
-                    <div class="d-row">
-                        <span class="d-title">Mileage</span>
-                        <span class="d-value">{{ number_format($car->mileage) }} km</span>
-                    </div>
-                    @endif
                     <div class="d-row">
                         <span class="d-title">Transmission</span>
                         <span class="d-value">{{ ucfirst($car->transmission) }}</span>
@@ -113,18 +95,6 @@
                     <div class="d-row">
                         <span class="d-title">Fuel Economy</span>
                         <span class="d-value">{{ $car->fuel_consumption }}L/100km</span>
-                    </div>
-                    @endif
-                    @if($car->color)
-                    <div class="d-row">
-                        <span class="d-title">Exterior Color</span>
-                        <span class="d-value">{{ ucfirst($car->color) }}</span>
-                    </div>
-                    @endif
-                    @if($car->interior_color)
-                    <div class="d-row">
-                        <span class="d-title">Interior Color</span>
-                        <span class="d-value">{{ ucfirst($car->interior_color) }}</span>
                     </div>
                     @endif
                 </div>
@@ -262,6 +232,9 @@
                                 <h5>Driver's License Number</h5>
                                 <input type="text" name="license_number" placeholder="Enter your driver's license number" 
                                        class="form-control" value="{{ old('license_number', auth()->check() ? auth()->user()->license_number : '') }}" required>
+                                @if(auth()->check() && auth()->user()->license_number)
+                                    <small class="text-muted">Using license number from your profile</small>
+                                @endif
                             </div>
 
                             <div class="col-lg-12 mb20">
@@ -322,9 +295,7 @@
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="de-item mb30">
                     <div class="d-img">
-                        @if($relatedCar->gallery && is_array($relatedCar->gallery) && count($relatedCar->gallery) > 0)
-                            <img src="{{ asset('images/cars/' . $relatedCar->gallery[0]) }}" class="img-fluid" alt="{{ $relatedCar->make }} {{ $relatedCar->model }}">
-                        @elseif($relatedCar->image)
+                        @if($relatedCar->image)
                             <img src="{{ asset('images/cars/' . $relatedCar->image) }}" class="img-fluid" alt="{{ $relatedCar->make }} {{ $relatedCar->model }}">
                         @else
                             <img src="{{ asset('images/cars/default-car.jpg') }}" class="img-fluid" alt="{{ $relatedCar->make }} {{ $relatedCar->model }}">

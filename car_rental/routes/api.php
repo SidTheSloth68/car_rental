@@ -99,9 +99,6 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'admin'])->group(function
     // Booking management endpoints
     Route::prefix('bookings')->group(function () {
         Route::get('/all', [BookingApiController::class, 'index']);
-        Route::put('/{booking}/status', [BookingApiController::class, 'updateStatus']);
-        Route::get('/export', [BookingApiController::class, 'export']);
-        Route::get('/analytics', [BookingApiController::class, 'analytics']);
     });
 
     // User management endpoints (if implemented)

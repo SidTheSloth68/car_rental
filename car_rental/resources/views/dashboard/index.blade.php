@@ -30,7 +30,11 @@
                     <div class="card p-4 rounded-5">
                         <div class="profile_avatar">
                             <div class="profile_img">
-                                <img src="{{ asset('images/profile/1.jpg') }}" alt="">
+                                @if($user->profile_photo)
+                                    <img src="{{ asset($user->profile_photo) }}" alt="{{ $user->name }}">
+                                @else
+                                    <img src="{{ asset('images/profile/1.jpg') }}" alt="{{ $user->name }}">
+                                @endif
                             </div>
                             <div class="profile_name">
                                 <h4>

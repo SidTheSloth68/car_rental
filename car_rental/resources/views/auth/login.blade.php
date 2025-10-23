@@ -84,16 +84,6 @@
                                     <div class="spacer-20"></div>
                                     
                                     <div class="text-center">
-                                        @if (Route::has('password.request'))
-                                            <a href="{{ route('password.request') }}" class="text-decoration-none">
-                                                {{ __('Forgot your password?') }}
-                                            </a>
-                                        @endif
-                                    </div>
-
-                                    <div class="spacer-10"></div>
-                                    
-                                    <div class="text-center">
                                         <span>Don't have an account? </span>
                                         <a href="{{ route('register') }}{{ request('message') ? '?message=' . request('message') : '' }}" class="text-decoration-none color-2">
                                             Register here

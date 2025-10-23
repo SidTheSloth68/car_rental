@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Rentaly Admin Dashboard">
-    <meta name="author" content="Rentaly">
+    <meta name="description" content="Caravel Admin Dashboard">
+    <meta name="author" content="Caravel">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Admin Dashboard') - Rentaly</title>
+    <title>@yield('title', 'Admin Dashboard') - Caravel</title>
 
     <!-- Custom fonts for this template-->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" type="text/css">
@@ -207,7 +207,7 @@
             <div class="sidebar-brand-icon">
                 <i class="fas fa-car"></i>
             </div>
-            <div class="sidebar-brand-text">Rentaly Admin</div>
+            <div class="sidebar-brand-text">Admin</div>
         </a>
 
         <!-- Nav Items -->
@@ -265,15 +265,6 @@
                     <!-- Dropdown - User Information -->
                     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                         aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="#" onclick="alert('Profile settings coming soon!')">
-                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Profile
-                        </a>
-                        <a class="dropdown-item" href="#" onclick="alert('Settings coming soon!')">
-                            <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Settings
-                        </a>
-                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
                             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                             Logout

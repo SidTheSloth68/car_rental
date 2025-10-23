@@ -272,7 +272,7 @@
                                             <input type="tel" 
                                                    name="customer_phone" 
                                                    class="form-control @error('customer_phone') is-invalid @enderror" 
-                                                   value="{{ old('customer_phone') }}"
+                                                   value="{{ old('customer_phone', auth()->user()->phone ?? '') }}"
                                                    placeholder="Enter your phone number"
                                                    required>
                                             @error('customer_phone')
@@ -284,12 +284,15 @@
                                             <input type="text" 
                                                    name="license_number" 
                                                    class="form-control @error('license_number') is-invalid @enderror" 
-                                                   value="{{ old('license_number') }}"
+                                                   value="{{ old('license_number', auth()->user()->license_number ?? '') }}"
                                                    placeholder="Enter your license number"
                                                    required>
                                             @error('license_number')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                            @if(auth()->user()->license_number)
+                                                <small class="text-muted">Using license number from your profile</small>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
