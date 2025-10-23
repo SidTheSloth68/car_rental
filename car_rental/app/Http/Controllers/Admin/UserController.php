@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $query = User::query();
 
-        // Filter by role
+    
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
@@ -31,11 +31,6 @@ class UserController extends Controller
             });
         }
 
-        // Filter by status
-        if ($request->filled('status')) {
-            $query->where('is_active', $request->status === 'active');
-        }
-
         $users = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return view('admin.users.index', compact('users'));
@@ -43,7 +38,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load(['bookings.car']);
+        $user->load('bookings');
         
         if (request()->wantsJson()) {
             return response()->json([
@@ -55,27 +50,29 @@ class UserController extends Controller
         return view('admin.users.show', compact('user'));
     }
 
-    public function create()
-    {
-        return view('admin.users.create');
-    }
-
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,customer',
+            'role' => 'required|in:admin,user',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'is_active' => 'boolean',
+            'license_number' => 'nullable|string|max:50',
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
         ]);
 
-        $userData = $request->only(['name', 'email', 'role', 'phone', 'address']);
+        $userData = $request->only(['name', 'email', 'role', 'phone', 'address', 'license_number']);
         $userData['password'] = bcrypt($request->password);
-        $userData['email_verified_at'] = now(); // Auto-verify admin created users
-        $userData['is_active'] = $request->has('is_active') ? (bool)$request->is_active : true;
+        $userData['email_verified_at'] = now(); 
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            $file = $request->file('profile_photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/users'), $filename);
+            $userData['profile_photo'] = 'images/users/' . $filename;
+        }
         
         $user = User::create($userData);
 
@@ -91,25 +88,31 @@ class UserController extends Controller
             ->with('success', 'User created successfully!');
     }
 
-    public function edit(User $user)
-    {
-        return view('admin.users.edit', compact('user'));
-    }
-
     public function update(Request $request, User $user)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:admin,customer',
+            'role' => 'required|in:admin,user',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'is_active' => 'boolean',
+            'license_number' => 'nullable|string|max:50',
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
         ]);
 
-        $userData = $request->only(['name', 'email', 'role', 'phone', 'address']);
-        if ($request->has('is_active')) {
-            $userData['is_active'] = (bool)$request->is_active;
+        $userData = $request->only(['name', 'email', 'role', 'phone', 'address', 'license_number']);
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old profile photo if exists
+            if ($user->profile_photo && file_exists(public_path($user->profile_photo))) {
+                unlink(public_path($user->profile_photo));
+            }
+            
+            $file = $request->file('profile_photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/users'), $filename);
+            $userData['profile_photo'] = 'images/users/' . $filename;
         }
 
         $user->update($userData);

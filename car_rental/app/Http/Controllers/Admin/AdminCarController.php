@@ -27,37 +27,12 @@ class AdminCarController extends Controller
             });
         }
 
-        // Filter by type
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
         // Filter by availability
         if ($request->filled('available')) {
             $query->where('is_available', $request->available);
         }
 
-        // Sorting
-        $sort = $request->get('sort', 'created_at');
-        switch ($sort) {
-            case 'make':
-                $query->orderBy('make')->orderBy('model');
-                break;
-            case 'daily_rate':
-                $query->orderBy('daily_rate', 'asc');
-                break;
-            case 'daily_rate_desc':
-                $query->orderBy('daily_rate', 'desc');
-                break;
-            case 'year':
-                $query->orderBy('year', 'desc');
-                break;
-            default:
-                $query->latest();
-                break;
-        }
-
-        $cars = $query->paginate(15);
+        $cars = $query->latest()->paginate(15);
         return view('admin.cars.index', compact('cars'));
     }
 
@@ -88,8 +63,7 @@ class AdminCarController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'features' => 'nullable|string',
             'description' => 'nullable|string',
-            'is_available' => 'boolean',
-            'is_featured' => 'boolean'
+            'is_available' => 'boolean'
         ]);
 
         // Handle image upload
@@ -107,7 +81,6 @@ class AdminCarController extends Controller
 
         // Set defaults
         $validated['is_available'] = $request->has('is_available');
-        $validated['is_featured'] = $request->has('is_featured');
 
         Car::create($validated);
 
@@ -149,8 +122,7 @@ class AdminCarController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'features' => 'nullable|string',
             'description' => 'nullable|string',
-            'is_available' => 'boolean',
-            'is_featured' => 'boolean'
+            'is_available' => 'boolean'
         ]);
 
         // Handle image upload
@@ -173,7 +145,6 @@ class AdminCarController extends Controller
 
         // Set boolean values
         $validated['is_available'] = $request->has('is_available');
-        $validated['is_featured'] = $request->has('is_featured');
 
         $car->update($validated);
 
