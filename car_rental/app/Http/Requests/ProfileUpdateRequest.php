@@ -27,6 +27,8 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
+            'license_number' => ['nullable', 'string', 'max:50'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,gif', 'max:2048'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'language' => ['nullable', 'string', 'max:50'],
             'hour_format' => ['nullable', 'string', 'in:12-hour,24-hour'],
