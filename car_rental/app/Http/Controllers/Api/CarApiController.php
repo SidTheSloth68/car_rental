@@ -450,18 +450,12 @@ class CarApiController extends Controller
             'transmission' => $car->transmission,
             'seats' => $car->seats,
             'doors' => $car->doors,
-            'color' => $car->color,
             'daily_rate' => $car->daily_rate,
-            'weekly_rate' => $car->weekly_rate,
-            'monthly_rate' => $car->monthly_rate,
             'image' => $car->image,
             'images' => $car->images ?: [],
             'is_available' => $car->is_available,
-            'is_featured' => $car->is_featured,
-            'location' => $car->location,
             'rating' => $car->rating,
             'reviews_count' => $car->reviews_count,
-            'likes_count' => $car->likes_count,
             'slug' => str($car->make . ' ' . $car->model . ' ' . $car->year)->slug(),
         ];
 
@@ -469,13 +463,7 @@ class CarApiController extends Controller
             $baseData = array_merge($baseData, [
                 'description' => $car->description,
                 'features' => $car->features ? (is_string($car->features) ? json_decode($car->features, true) : $car->features) : [],
-                'mileage' => $car->mileage,
-                'engine_size' => $car->engine_size,
-                'horsepower' => $car->horsepower,
                 'luggage_capacity' => $car->luggage_capacity,
-                'license_plate' => $car->license_plate,
-                'total_bookings' => $car->total_bookings,
-                'average_rating' => $car->average_rating,
                 'last_service_date' => $car->last_service_date,
                 'next_service_date' => $car->next_service_date,
             ]);

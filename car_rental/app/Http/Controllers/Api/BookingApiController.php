@@ -37,7 +37,7 @@ class BookingApiController extends Controller
                 ], 401);
             }
 
-            // Apply additional filters
+            
             $this->applyBookingFilters($query, $request);
 
             // Apply sorting
@@ -49,7 +49,7 @@ class BookingApiController extends Controller
             $perPage = min($request->get('per_page', 15), 50);
             $bookings = $query->paginate($perPage);
 
-            // Transform the data
+           
             $transformedBookings = $bookings->through(function ($booking) {
                 return $this->transformBooking($booking);
             });
@@ -80,9 +80,7 @@ class BookingApiController extends Controller
         }
     }
 
-    /**
-     * Get authenticated user's bookings.
-     */
+ 
     public function userBookings(Request $request): JsonResponse
     {
         try {
@@ -132,9 +130,7 @@ class BookingApiController extends Controller
         }
     }
 
-    /**
-     * Store a newly created booking.
-     */
+    
     public function store(BookingRequest $request): JsonResponse
     {
         DB::beginTransaction();
@@ -154,8 +150,6 @@ class BookingApiController extends Controller
                 'status' => 'pending',
                 'total_amount' => $bookingDetails['total_amount'],
                 'tax_amount' => $bookingDetails['tax_amount'],
-                'insurance_amount' => $bookingDetails['insurance_amount'],
-                'additional_fees' => $bookingDetails['additional_fees'],
                 'discount_amount' => $bookingDetails['discount_amount'],
                 'final_amount' => $bookingDetails['final_amount'],
                 'rental_days' => $bookingDetails['rental_days'],
@@ -169,8 +163,7 @@ class BookingApiController extends Controller
             // Update car booking count
             $car->increment('total_bookings');
 
-            // Send confirmation notification (you can implement this later)
-            // $this->sendBookingConfirmation($booking);
+         
 
             DB::commit();
 
@@ -194,9 +187,7 @@ class BookingApiController extends Controller
         }
     }
 
-    /**
-     * Display the specified booking.
-     */
+ 
     public function show(Booking $booking): JsonResponse
     {
         try {
@@ -317,8 +308,7 @@ class BookingApiController extends Controller
                 'refund_amount' => $cancellationCheck['refund_amount'],
             ]);
 
-            // Process refund (implement payment gateway integration)
-            // $this->processRefund($booking);
+           
 
             DB::commit();
 
@@ -511,8 +501,6 @@ class BookingApiController extends Controller
                 'pickup_time' => $booking->pickup_time,
                 'return_time' => $booking->return_time,
                 'tax_amount' => $booking->tax_amount,
-                'insurance_amount' => $booking->insurance_amount,
-                'additional_fees' => $booking->additional_fees,
                 'discount_amount' => $booking->discount_amount,
                 'payment_method' => $booking->payment_method,
                 'insurance_coverage' => $booking->insurance_coverage,
@@ -588,8 +576,6 @@ class BookingApiController extends Controller
             'rental_days' => $rentalDays,
             'total_amount' => round($baseAmount, 2),
             'tax_amount' => round($taxAmount, 2),
-            'insurance_amount' => round($insuranceAmount, 2),
-            'additional_fees' => round($additionalFees, 2),
             'discount_amount' => round($discountAmount, 2),
             'final_amount' => round($finalAmount, 2),
         ];
