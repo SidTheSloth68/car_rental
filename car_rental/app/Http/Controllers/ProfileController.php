@@ -29,6 +29,19 @@ class ProfileController extends Controller
         $user = $request->user();
         $validated = $request->validated();
         
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old profile photo if exists
+            if ($user->profile_photo && file_exists(public_path($user->profile_photo))) {
+                unlink(public_path($user->profile_photo));
+            }
+            
+            $file = $request->file('profile_photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/users'), $filename);
+            $validated['profile_photo'] = 'images/users/' . $filename;
+        }
+        
         // Handle password update separately
         if (!empty($validated['password'])) {
             $validated['password'] = bcrypt($validated['password']);
@@ -41,11 +54,6 @@ class ProfileController extends Controller
         unset($validated['password_confirmation']);
         
         $user->fill($validated);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
         $user->save();
 
         return Redirect::route('dashboard.profile')->with('status', 'Profile updated successfully!');

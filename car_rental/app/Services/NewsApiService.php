@@ -34,8 +34,8 @@ class NewsApiService
     {
         $cacheKey = "car_news_{$pageSize}_{$page}_{$language}";
         
-        // Cache for 30 minutes to avoid excessive API calls
-        return Cache::remember($cacheKey, 1800, function () use ($pageSize, $page, $language) {
+        // Cache for 2 hours to avoid excessive API calls
+        return Cache::remember($cacheKey, 7200, function () use ($pageSize, $page, $language) {
             try {
                 // Check if using mediastack API
                 if (str_starts_with($this->apiKey, 'api_live_')) {
@@ -125,7 +125,7 @@ class NewsApiService
     {
         $cacheKey = "top_car_headlines_{$country}_{$pageSize}";
         
-        return Cache::remember($cacheKey, 1800, function () use ($country, $pageSize) {
+        return Cache::remember($cacheKey, 7200, function () use ($country, $pageSize) {
             try {
                 // Check if using mediastack API
                 if (str_starts_with($this->apiKey, 'api_live_')) {
@@ -191,7 +191,7 @@ class NewsApiService
     {
         $cacheKey = "news_topic_" . md5($topic) . "_{$pageSize}";
         
-        return Cache::remember($cacheKey, 1800, function () use ($topic, $pageSize) {
+        return Cache::remember($cacheKey, 7200, function () use ($topic, $pageSize) {
             try {
                 // Check if using mediastack API
                 if (str_starts_with($this->apiKey, 'api_live_')) {
@@ -264,7 +264,7 @@ class NewsApiService
     {
         $cacheKey = "ev_news_{$pageSize}_{$page}";
         
-        return Cache::remember($cacheKey, 1800, function () use ($pageSize, $page) {
+        return Cache::remember($cacheKey, 7200, function () use ($pageSize, $page) {
             try {
                 $response = Http::get("{$this->baseUrl}/everything", [
                     'apiKey' => $this->apiKey,
@@ -298,7 +298,7 @@ class NewsApiService
     {
         $cacheKey = "car_reviews_{$pageSize}_{$page}";
         
-        return Cache::remember($cacheKey, 1800, function () use ($pageSize, $page) {
+        return Cache::remember($cacheKey, 7200, function () use ($pageSize, $page) {
             try {
                 $response = Http::get("{$this->baseUrl}/everything", [
                     'apiKey' => $this->apiKey,
@@ -332,7 +332,7 @@ class NewsApiService
     {
         $cacheKey = "industry_news_{$pageSize}_{$page}";
         
-        return Cache::remember($cacheKey, 1800, function () use ($pageSize, $page) {
+        return Cache::remember($cacheKey, 7200, function () use ($pageSize, $page) {
             try {
                 $response = Http::get("{$this->baseUrl}/everything", [
                     'apiKey' => $this->apiKey,

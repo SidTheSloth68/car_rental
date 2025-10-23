@@ -144,15 +144,13 @@ class DashboardController extends Controller
         
         // Get actual user favorites from the database
         $favoriteCars = $user->favorites()
-            ->select('cars.id', 'cars.make', 'cars.model', 'cars.year', 'cars.image', 'cars.gallery', 'cars.seats', 'cars.luggage_capacity', 'cars.doors', 'cars.fuel_type', 'cars.horsepower', 'cars.engine_size', 'cars.transmission', 'cars.type', 'cars.daily_rate', 'cars.is_available')
+            ->select('cars.id', 'cars.make', 'cars.model', 'cars.year', 'cars.image', 'cars.seats', 'cars.luggage_capacity', 'cars.doors', 'cars.fuel_type', 'cars.transmission', 'cars.type', 'cars.daily_rate', 'cars.is_available')
             ->get()
             ->map(function($car) {
                 // Determine the image path
                 $imagePath = 'images/cars/default-car.jpg'; // default fallback
                 
-                if ($car->gallery && is_array($car->gallery) && count($car->gallery) > 0) {
-                    $imagePath = 'images/cars/' . $car->gallery[0];
-                } elseif ($car->image) {
+                if ($car->image) {
                     $imagePath = 'images/cars/' . $car->image;
                 }
                 
@@ -164,8 +162,6 @@ class DashboardController extends Controller
                     'luggage' => $car->luggage_capacity ?: 2,
                     'doors' => $car->doors ?: 4,
                     'fuel' => $car->fuel_type ?: 'Petrol',
-                    'horsepower' => $car->horsepower ?: 200,
-                    'engine' => $car->engine_size ?: 2000,
                     'drive' => $car->transmission ?: 'Manual',
                     'type' => $car->type ?: 'Sedan',
                     'daily_rate' => $car->daily_rate ?: 100,

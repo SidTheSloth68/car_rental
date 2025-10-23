@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Car;
-use App\Models\News;
 use App\Services\NewsApiService;
 
 class HomeController extends Controller
@@ -23,9 +21,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Get featured cars from database
-        $featuredCars = Car::featured()
-            ->available()
+       
+        $featuredCars = Car::available()
+            ->orderBy('created_at', 'desc')
             ->distinct()
             ->take(6)
             ->get()
@@ -36,22 +34,22 @@ class HomeController extends Controller
                     'name' => $car->full_name,
                     'image' => $car->image,
                     'price' => $car->daily_rate,
-                    'likes' => $car->likes_count,
+                    'likes' => 0, // Removed field
                     'seats' => $car->seats,
                     'luggage' => $car->luggage_capacity,
                     'doors' => $car->doors,
                     'fuel' => ucfirst($car->fuel_type),
                     'type' => ucwords(str_replace('_', ' ', $car->type)),
-                    'rating' => $car->average_rating,
+                    'rating' => 5, 
                     'is_available' => $car->is_available
                 ];
             });
 
-        // Fetch latest news from NewsAPI (3 articles)
+     
         $apiResponse = $this->newsApiService->fetchCarNews(3, 1);
         $articles = collect($apiResponse['articles'] ?? []);
         
-        // Transform articles for display
+      
         $latestNews = $articles->take(3)->map(function($article) {
             $transformed = $this->newsApiService->transformArticle($article);
             return [
@@ -126,39 +124,5 @@ class HomeController extends Controller
         ];
 
         return view('home', $data);
-    }
-
-    /**
-     * Show the car search results.
-     *
-     * @param Request $request
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function search(Request $request)
-    {
-        // Handle car search functionality
-        // This will be expanded in later commits
-        
-        return redirect()->route('home')->with('message', 'Search functionality will be implemented soon!');
-    }
-
-    /**
-     * Handle car search requests (placeholder implementation)
-     */
-    public function searchCars(Request $request)
-    {
-        // Validate the search form inputs
-        $request->validate([
-            'pickup_location' => 'required|string|max:255',
-            'dropoff_location' => 'required|string|max:255',
-            'pickup_date' => 'required|date|after_or_equal:today',
-            'return_date' => 'required|date|after:pickup_date',
-            'car_type' => 'nullable|string|in:economy,compact,standard,suv,luxury,convertible',
-            'price_range' => 'nullable|string|in:0-50,50-100,100-200,200+',
-        ]);
-
-        // For now, redirect back with a success message
-        // Car search functionality will be implemented in future commits
-        return redirect()->back()->with('success', 'Car search functionality will be implemented in upcoming commits. Your search criteria have been saved.');
     }
 }
