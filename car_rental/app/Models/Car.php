@@ -26,24 +26,10 @@ class Car extends Model
         'doors',
         'luggage_capacity',
         'daily_rate',
-        'mileage',
-        'color',
-        'license_plate',
-        'vin',
-        'engine_size',
-        'horsepower',
         'image',
-        'gallery',
         'features',
         'description',
-        'is_available',
-        'is_featured',
-        'location',
-        'pickup_locations',
-        'insurance_included',
-        'minimum_age',
-        'deposit_amount',
-        'cancellation_policy'
+        'is_available'
     ];
 
     /**
@@ -56,17 +42,8 @@ class Car extends Model
         'seats' => 'integer',
         'doors' => 'integer',
         'daily_rate' => 'decimal:2',
-        'mileage' => 'integer',
-        'engine_size' => 'decimal:1',
-        'horsepower' => 'integer',
-        'gallery' => 'array',
         'features' => 'array',
-        'pickup_locations' => 'array',
         'is_available' => 'boolean',
-        'is_featured' => 'boolean',
-        'insurance_included' => 'boolean',
-        'minimum_age' => 'integer',
-        'deposit_amount' => 'decimal:2',
         'deleted_at' => 'datetime'
     ];
 
@@ -146,14 +123,6 @@ class Car extends Model
     public function scopeAvailable($query)
     {
         return $query->where('is_available', true);
-    }
-
-    /**
-     * Scope to get featured cars
-     */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
     }
 
     /**

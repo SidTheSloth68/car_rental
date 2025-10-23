@@ -26,19 +26,8 @@ class User extends Authenticatable
         'address',
         'language',
         'hour_format',
-        'date_of_birth',
         'license_number',
-        'license_expiry',
         'profile_photo',
-        'bio',
-        'preferences',
-        'emergency_contact_name',
-        'emergency_contact_phone',
-        'is_active',
-        'last_login_at',
-        'loyalty_points',
-        'preferred_payment_method',
-        'email_verified_at',
     ];
 
     /**
@@ -59,7 +48,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
